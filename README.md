@@ -21,7 +21,7 @@ A React Native SDK for integrating Nugget's chat and support functionality into 
 - React Native version: 0.73.2 or higher
 - iOS:
   - Minimum iOS version: 14.0
-  - Xcode: Latest stable version
+  - Xcode: Supported only till XCode 16.2
 - Android:
   - compileSdkVersion: 35 or higher
   - Android Gradle Plugin (AGP): 8.2.0 or higher
@@ -31,9 +31,7 @@ A React Native SDK for integrating Nugget's chat and support functionality into 
 ## Installation
 
 ```bash
-npm install @nugget/react-native-sdk
-# or
-yarn add @nugget/react-native-sdk
+yarn add react-native-nugget-sdk@https://github.com/pranavzmt/react-native-nugget-sdk.git
 ```
 
 ## Setup
@@ -41,16 +39,16 @@ yarn add @nugget/react-native-sdk
 ### iOS Setup
 1. Add the following to your `Podfile`:
 ```ruby
-pod 'NuggetRN', :path => '../node_modules/@nugget/react-native-sdk'
+pod 'NuggetSDK', :git => 'https://github.com/Zomato-Nugget/nugget-sdk-ios', :tag => '0.0.8'
 ```
 
 2. Install the pods:
 ```bash
-cd ios && pod install
+cd ios && yarn install && pod install
 ```
 
 ### Android Setup
-No additional setup required for Android.
+Not needed as of now.
 
 ## Usage
 
@@ -59,7 +57,18 @@ No additional setup required for Android.
 1. Initialize the NuggetModule:
 
 ```typescript
-import { NuggetModule, NuggetPlugin, NativeEventEmitter } from '@nugget/react-native-sdk';
+import { NativeModules, Platform, NativeEventEmitter } from 'react-native';
+
+const LINKING_ERROR =
+  `The package 'react-native-nugget-sdk' doesn\'t seem to be linked. Make sure: \n\n` +
+  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
+  '- You rebuilt the app after installing the package\n' +
+  '- You are not using Expo Go\n';
+
+const NuggetPlugin = NativeModules.NuggetRN
+  ? NativeModules.NuggetRN
+  : new Proxy({}, { get() { throw new Error(LINKING_ERROR); }, }
+ );
 
 const nuggetModule = new NuggetModule();
 
