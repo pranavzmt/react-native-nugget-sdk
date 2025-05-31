@@ -1,23 +1,28 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { NuggetModule } from 'nugget-rn';
+import { useNuggetSDK } from './components/NuggetSDKProvider';
 
 export default function NuggetMockScreen() {
   const [result, setResult] = useState<string>('');
-  let nuggetPlugin = new NuggetModule();
-   const chetDeeplink = 'stashfin://unified-support/conversation?flowType=ticketing&omniTicketingFlow=true';
-  const openNuggetSDK = () => {
-    // Replace 'yourdeeplink://' with the actual deeplink if needed
-    nuggetPlugin.openNuggetSDK(chetDeeplink).then((nuggetSDKResult: string) => {
-      setResult(nuggetSDKResult);
-    });
+  const { sdk } = useNuggetSDK();
+  const chatDeeplink = 'stashfin://unified-support/conversation?flowType=ticketing&omniTicketingFlow=true';
+
+  const openNuggetSDK = async () => {
+    try {
+      const opened = await sdk.openNuggetSDK(chatDeeplink);
+      setResult(opened ? 'SDK opened successfully' : 'Failed to open SDK');
+    } catch (error) {
+      setResult(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
-  const verifyDeeplink = () => {
-    // Replace 'yourdeeplink://' with the actual deeplink you want to verify
-    nuggetPlugin.canOpenDeeplink(chetDeeplink).then((canOpenDeeplink: boolean) => {
-      setResult(`Can open deeplink: ${canOpenDeeplink}`);
-    });
+  const verifyDeeplink = async () => {
+    try {
+      const canOpen = await sdk.canOpenDeeplink(chatDeeplink);
+      setResult(`Can open deeplink: ${canOpen}`);
+    } catch (error) {
+      setResult(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
   return (

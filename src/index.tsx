@@ -1,236 +1,177 @@
 import { NativeModules, Platform, NativeEventEmitter } from 'react-native';
 
 const LINKING_ERROR =
-  `The package 'nugget-rn' doesn\'t seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n';
+    `The package 'nugget-rn' doesn\'t seem to be linked. Make sure: \n\n` +
+    Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
+    '- You rebuilt the app after installing the package\n' +
+    '- You are not using Expo Go\n';
 
-const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBWZXJzaW9uIjoiIiwiYnVzaW5lc3NJZCI6MSwiY2xpZW50SWQiOjEsImNsaWVudF9uYW1lIjoiem9tYXRvIiwiZGlzcGxheU5hbWUiOiJQcmFuYXYiLCJlbWFpbCI6InByYW5hdkBudWdnZXQuY29tIiwiZXhwIjoxNzQ4NzgxODEwLCJob3N0TmFtZSI6ImRhc2hib2FyZC5udWdnZXQuY29tIiwiaWF0IjoxNzQ4Njk1NDEwLCJwaG9uZU51bWJlciI6IiIsInBob3RvVVJMIjoiIiwic291cmNlIjoiZGVza3RvcCIsInRlbmFudElEIjoxLCJ1aWQiOiJwcmFuYXYtanVtYm8tdGVzdC0xMDAifQ.UaMF3hFxNnQEmFslMmkuTQdN3crhYPBVktgKiwatLIs';
-const userID = '350072074';
 const NuggetPlugin = NativeModules.NuggetRN
-  ? NativeModules.NuggetRN
-  : new Proxy(
-      {},
-      {
-        get() { 
-          throw new Error(LINKING_ERROR);
-        },
-      }
+    ? NativeModules.NuggetRN
+    : new Proxy(
+        {},
+        {
+            get() {
+                throw new Error(LINKING_ERROR);
+            },
+        }
     );
 
 // Auth Provider Interface
-interface NuggetAuthUserInfo {
-  clientID: number;
-  accessToken: string;
-  userName?: string;
-  userID: string;
-  photoURL?: string;
+export interface NuggetAuthUserInfo {
+    accessToken: string;
 }
 
-interface NuggetAuthProvider {
-  getAuthInfo(): Promise<NuggetAuthUserInfo>;
-  refreshAuthInfo(): Promise<NuggetAuthUserInfo>;
-}
-
-class DefaultAuthProvider implements NuggetAuthProvider {
-  async getAuthInfo(): Promise<NuggetAuthUserInfo> {
-    return {
-      clientID: 1,
-      accessToken: accessToken,
-      userID: userID,
-      userName: '',
-      photoURL: '',
-    };
-  }
-
-  async refreshAuthInfo(): Promise<NuggetAuthUserInfo> {
-    return this.getAuthInfo();
-  }
+export interface NuggetAuthProvider {
+    getAuthInfo(): Promise<NuggetAuthUserInfo>;
+    refreshAuthInfo(): Promise<NuggetAuthUserInfo>;
 }
 
 // SDK Configuration Interface
-interface NuggetJumborConfiguration {
-  nameSpace: string;
+export interface NuggetJumborConfiguration {
+    nameSpace: string;
 }
 
+// not used
 interface NuggetSDKConfiguration {
-  getJumboConfig(): Promise<{ [key: string]: any }>;
+    getJumboConfig(): Promise<{ [key: string]: any }>;
 }
 
-class DefaultSDKConfiguration implements NuggetSDKConfiguration {
-  async getJumboConfig(): Promise<{ [key: string]: any }> {
-    return {
-      nameSpace: 'rn-namespace',
-    };
-  }
+// Event Interface
+export interface NativeRequestEvent {
+    method: string;
+    payload: any;
 }
 
-// Notification Interface
-interface NuggetNotificationInfo {
-  notificationID: string;
+export interface NuggetEventBridge {
+    OnNativeRequest: NativeRequestEvent;
 }
 
-interface NuggetNotificationProvider {
-  getNotificationInfo(): Promise<NuggetNotificationInfo>;
-}
+export class NuggetSDK {
+    private static instance: NuggetSDK | null = null;
+    private config: NuggetJumborConfiguration;
+    private authDelegate: NuggetAuthProvider | null = null;
 
-class DefaultNotificationProvider implements NuggetNotificationProvider {
-  async getNotificationInfo(): Promise<NuggetNotificationInfo> {
-    return {
-      notificationID: 'your-default-notification-id',
-    };
-  }
-}
+    private eventEmitter: NativeEventEmitter;
+    private eventSubscription: any;
 
-// Add these interfaces after the existing interfaces
-interface NativeRequestEvent {
-  method: string;
-  payload: any;
-}
+    private constructor(config: NuggetJumborConfiguration) {
+        this.config = config;
+        this.eventEmitter = new NativeEventEmitter(NuggetPlugin);
 
-interface NuggetEventBridge {
-  OnNativeRequest: NativeRequestEvent;
-}
+        this.eventSubscription = this.eventEmitter.addListener(
+            'OnNativeRequest',
+            async (event: NativeRequestEvent) => {
+                try {
+                    const { method, payload } = event;
+                    let result;
 
-// Add this interface after your existing interfaces
-interface ChatBusinessContext {
-  channelHandle?: string;
-  ticketGroupingId?: string;
-  ticketProperties?: { [key: string]: string[] };
-  botProperties?: { [key: string]: string[] };
-}
+                    switch (method) {
+                        case 'requiresAuthInfo':
+                            result = { success: await this.getAuthInfo() };
+                            break;
+                        case 'requestRefreshAuthInfo':
+                            result = { success: await this.refreshAuthInfo() };
+                            break;
+                        case 'getJumboConfig':
+                            result = this.getConfiguration();
+                            break;
+                        default:
+                            console.warn(`Unknown method received: ${method}`);
+                            result = { error: 'Unknown method' };
+                    }
 
-class NuggetModule {
-  private eventEmitter: NativeEventEmitter;
-  private sdkConfigurationDelegate: NuggetSDKConfiguration;
-  private eventSubscription: any;
+                    NuggetPlugin.onJsResponse(method, result);
+                } catch (error) {
+                    console.error('Error handling native request:', error);
+                    NuggetPlugin.onJsResponse(event.method, {
+                        error: error instanceof Error ? error.message : 'Unknown error'
+                    });
+                }
+            }
+        );
+        NuggetPlugin.initializeNuggetFactory(config);
+    }
 
-  constructor() {
-    this.eventEmitter = new NativeEventEmitter(NuggetPlugin);
+    public static getInstance(config: NuggetJumborConfiguration): NuggetSDK {
 
-    this.sdkConfigurationDelegate = new DefaultSDKConfiguration();
-
-    this.eventSubscription = this.eventEmitter.addListener(
-      'OnNativeRequest',
-      async (event: NativeRequestEvent) => {
-        try {
-          const { method, payload } = event;
-          let result;
-
-          switch (method) {
-            case 'requiresAuthInfo':
-              result = { success: await this.getAuthInfo() };
-              break;
-            case 'requestRefreshAuthInfo':
-              result = { success: await this.refreshAuthInfo() };
-              break;
-            case 'getJumboConfig':
-              result = await this.sdkConfigurationDelegate.getJumboConfig();
-              break;
-            default:
-              console.warn(`Unknown method received: ${method}`);
-              result = { error: 'Unknown method' };
-          }
-
-          NuggetPlugin.onJsResponse(method, result);
-        } catch (error) {
-          console.error('Error handling native request:', error);
-          NuggetPlugin.onJsResponse(event.method, { 
-            error: error instanceof Error ? error.message : 'Unknown error'
-          });
+        if (!NuggetSDK.instance) {
+            NuggetSDK.instance = new NuggetSDK(config);
         }
-      }
-    );
+        // If called again with a new config, the existing instance's config is not updated.
+        // This is typical for basic singletons: initialize once.
+        return NuggetSDK.instance;
+    }
 
-    // Initialize with configuration and chat business context
-    this.initialize();
-  }
+    public setAuthDelegate(delegate: NuggetAuthProvider) {
+        this.authDelegate = delegate;
+    }
 
-  private initialize() {
-    if (typeof NuggetPlugin.initializeNuggetFactory === 'function') {
-      const defaultContext = {
-        channelHandle: "default-channel",
-        ticketGroupingId: "default-group",
-        ticketProperties: {
-          "priority": ["high"],
-          "category": ["support"]
-        },
-        botProperties: {
-          "cp_device_id": ["default-device"],
-          "cp_auth_token": ["default-token"]
+    private async getAuthInfo(): Promise<{ [key: string]: any }> {
+        if (!this.authDelegate) {
+            throw new Error('Auth delegate not set. Please call setAuthDelegate first.');
         }
-      };
-      NuggetPlugin.initializeNuggetFactory(defaultContext);
-    } else {
-      console.error(
-        'Failed to initialize NuggetModule: initializeNuggetFactory is not a function'
-      );
+        const authInfoFromDelegate: NuggetAuthUserInfo = await this.authDelegate.getAuthInfo();
+        return { ...authInfoFromDelegate };
     }
-  }
 
-  // Add cleanup method
-  public cleanup() {
-    if (this.eventSubscription) {
-      this.eventSubscription.remove();
-      this.eventSubscription = null;
+    private async refreshAuthInfo(): Promise<{ [key: string]: any }> {
+        if (!this.authDelegate) {
+            throw new Error('Auth delegate not set. Please call setAuthDelegate first.');
+        }
+        const refreshedAuthInfoFromDelegate: NuggetAuthUserInfo = await this.authDelegate.refreshAuthInfo();
+        return { ...refreshedAuthInfoFromDelegate };
     }
-  }
 
-  async canOpenDeeplink(deeplink: string): Promise<boolean> {
-    return new Promise((resolve) => {
-      NuggetPlugin.canOpenDeeplink(deeplink, (result: any) => {
-        console.log('canOpenDeeplink-result', result);
-        resolve(result.canOpenDeeplink === true);
-      });
-    });
-  }
-
-  async openNuggetSDK(deeplink: string): Promise<string> {
-    return new Promise((resolve) => {
-      NuggetPlugin.openNuggetSDK(deeplink, (result: any) => {
-        console.log('openNuggetSDK-result', result);
-        resolve(result.nuggetSDKResult);
-      });
-    });
-  }
-
-  // Auth Provider
-  async getAuthInfo(): Promise<{ [key: string]: any }> {
-    try {
-      const nuggetAuthUserInfo: NuggetAuthUserInfo = {
-        clientID: 1,
-        accessToken: accessToken,
-        userID: userID,
-        userName: '',
-        photoURL: '',
-      };
-
-      return { ...nuggetAuthUserInfo };
-    } catch (error) {
-      console.error('Error in getAuthInfo:', error);
-      throw error;
+    private getConfiguration(): { [key: string]: any } {
+        return { ...this.config };
     }
-  }
 
-  async refreshAuthInfo(): Promise<{ [key: string]: any }> {
-    return this.getAuthInfo();
-  }
+    /**
+     * Checks if the SDK can handle the given deeplink
+     * @param deeplink - The deeplink URL to validate
+     * @returns Promise resolving to true if the deeplink can be handled
+     * @throws Error if the deeplink is invalid
+     */
+    public async canOpenDeeplink(deeplink: string): Promise<boolean> {
 
-  public addListener<K extends keyof NuggetEventBridge>(
-    eventType: K,
-    listener: (event: NuggetEventBridge[K]) => void
-  ) {
-    return this.eventEmitter.addListener(eventType, listener);
-  }
+        if (!deeplink || typeof deeplink !== 'string') {
+            throw new Error('Invalid deeplink parameter: deeplink must be a non-empty string');
+        }
+
+        return new Promise((resolve) => {
+            try {
+                NuggetPlugin.canOpenDeeplink(deeplink, (result: any) => {
+                    resolve(!!result?.canOpenDeeplink);
+                });
+            } catch (error) {
+                console.error('Error checking deeplink:', error);
+                resolve(false);
+            }
+        });
+    }
+
+    /**
+     * Opens the Nugget SDK with the specified deeplink
+     * @param deeplink - The deeplink URL to open
+     * @returns Promise resolving to true if SDK opened successfully
+     * @throws Error if the deeplink is invalid
+     */
+    public async openNuggetSDK(deeplink: string): Promise<boolean> {
+
+        if (!deeplink || typeof deeplink !== 'string') {
+            throw new Error('Invalid deeplink parameter: deeplink must be a non-empty string');
+        }
+
+        return new Promise((resolve) => {
+            try {
+                NuggetPlugin.openNuggetSDK(deeplink, (result: any) => {
+                    resolve(!!result?.nuggetSDKResult);
+                });
+            } catch (error) {
+                console.error('Error opening Nugget SDK:', error);
+                resolve(false);
+            }
+        });
+    }
 }
-
-export { NuggetModule, DefaultAuthProvider, DefaultSDKConfiguration };
-
-export type {
-  NuggetAuthProvider,
-  NuggetSDKConfiguration,
-  NuggetAuthUserInfo,
-  NuggetJumborConfiguration,
-  ChatBusinessContext,
-};

@@ -125,6 +125,7 @@ class NuggetRN: RCTEventEmitter {
   func requestValueFromJS(
     method: String, payload: [String: Any], completion: @escaping (Any) -> Void
   ) {
+    print("requestValueFromJS", method, payload)
     pendingCompletions[method] = completion
     sendEvent(
       withName: "OnNativeRequest",
@@ -147,6 +148,7 @@ class NuggetRN: RCTEventEmitter {
 extension NuggetRN: NuggetAuthProviderDelegate {
   
   private func createAuthObjectFromDictionary(dictionary: [String: Any]) -> NuggetAuthUserInfo? {
+    print("createAuthObjectFromDictionary", dictionary)
     guard let accessToken = dictionary["accessToken"] as? String else { return nil }
     return ClientAuthToken(accessToken: accessToken)
   }
@@ -182,7 +184,7 @@ extension NuggetRN: NuggetAuthProviderDelegate {
     var clientID: Int = 1
     var accessToken: String
     var userName: String? = nil
-    var userID: String = "350072074"
+    var userID: String = .init()
     var photoURL: String = .init()
     
     init(accessToken: String) {
