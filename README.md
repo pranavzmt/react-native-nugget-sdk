@@ -1,20 +1,6 @@
 # Nugget React Native SDK
 
-A React Native SDK for integrating Nugget's chat and support functionality into your mobile applications.
-
-## Table of Contents
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Setup](#setup)
-  - [iOS Setup](#ios-setup)
-  - [Android Setup](#android-setup)
-- [Usage](#usage)
-  - [Basic Implementation](#basic-implementation)
-  - [Authentication](#authentication)
-  - [Deep Linking](#deep-linking)
-  - [Event Handling](#event-handling)
-- [API Reference](#api-reference)
-- [Troubleshooting](#troubleshooting)
+A React Native SDK for integrating Nugget's functionality into your mobile applications.
 
 ## Requirements
 
@@ -31,7 +17,7 @@ A React Native SDK for integrating Nugget's chat and support functionality into 
 ## Installation
 
 ```bash
-yarn add react-native-nugget-sdk@https://github.com/pranavzmt/react-native-nugget-sdk.git
+yarn add nugget-sdk@https://github.com/pranavzmt/react-native-nugget-sdk.git
 ```
 
 ## Setup
@@ -52,119 +38,138 @@ Not needed as of now.
 
 ## Usage
 
-### Basic Implementation
+This section guides you through integrating and using the Nugget React Native SDK in your application.
 
-1. Initialize the NuggetModule:
+### 1. Importing the SDK
+
+First, import the necessary components from the `nugget-sdk` package:
 
 ```typescript
-import { NativeModules, Platform, NativeEventEmitter } from 'react-native';
-
-const LINKING_ERROR =
-  `The package 'react-native-nugget-sdk' doesn\'t seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n';
-
-const NuggetPlugin = NativeModules.NuggetRN
-  ? NativeModules.NuggetRN
-  : new Proxy({}, { get() { throw new Error(LINKING_ERROR); }, }
- );
-
-const nuggetModule = new NuggetModule();
-
-// Initialize with default configuration
-nuggetModule.initialize();
+import { NuggetSDK, NuggetJumborConfiguration, NuggetAuthProvider, NuggetAuthUserInfo } from 'nugget-sdk';
 ```
 
-2. Configure SDK Settings:
+### 2. Initializing the SDK
+
+To use the SDK, you need to obtain an instance of the `NuggetSDK`. This is done by calling the static `getInstance` method with your SDK configuration. The configuration requires a `nameSpace`.
 
 ```typescript
-const defaultContext = {
-  channelHandle: "your-channel",
-  ticketGroupingId: "your-group-id",
-  ticketProperties: {
-    priority: ["high"],
-    category: ["support"]
-  },
-  botProperties: {
-    cp_device_id: ["device-id"],
-    cp_auth_token: ["auth-token"]
-  }
+// Define your SDK configuration
+const nuggetSDKConfig: NuggetJumborConfiguration = {
+  nameSpace: 'your-app-namespace' // Replace with your application's unique namespace
 };
 
-NuggetPlugin.initializeNuggetFactory(defaultContext);
+// Get an instance of the NuggetSDK
+const nuggetSDK = NuggetSDK.getInstance(nuggetSDKConfig);
 ```
+The `NuggetSDK` is a singleton; calling `getInstance` multiple times will return the same instance. The configuration is applied only upon the first call.
 
-### Authentication
+### 3. Setting up Authentication
 
-Implement authentication by extending the NuggetModule class:
+The Nugget SDK requires an authentication delegate to handle user authentication. You must provide an object that implements the `NuggetAuthProvider` interface. This interface has two methods:
+
+*   `getAuthInfo(): Promise<NuggetAuthUserInfo>`: Called by the SDK to get the current user's authentication token.
+*   `refreshAuthInfo(): Promise<NuggetAuthUserInfo>`: Called by the SDK if it needs to refresh an expired or invalid token.
+
+The `NuggetAuthUserInfo` object should contain an `accessToken`.
+
+Here's an example of how to implement `NuggetAuthProvider` and set the delegate:
 
 ```typescript
-class MyNuggetModule extends NuggetModule {
-  async getAuthInfo(): Promise<{ [key: string]: any }> {
-    return {
-      clientID: YOUR_CLIENT_ID,
-      accessToken: YOUR_ACCESS_TOKEN,
-      userID: USER_ID,
-      userName: USER_NAME,
-      photoURL: USER_PHOTO_URL
-    };
+// 1. Implement the NuggetAuthProvider interface
+class MyAppAuthProvider implements NuggetAuthProvider {
+  async getAuthInfo(): Promise<NuggetAuthUserInfo> {
+    // Replace with your logic to retrieve the current user's access token
+    const accessToken = await getCurrentUserToken();
+    return { accessToken: accessToken };
   }
 
-  async refreshAuthInfo(): Promise<{ [key: string]: any }> {
-    // Implement your token refresh logic here
-    return this.getAuthInfo();
+  async refreshAuthInfo(): Promise<NuggetAuthUserInfo> {
+    // Replace with your logic to refresh the access token
+    const newAccessToken = await refreshCurrentUserToken();
+    return { accessToken: newAccessToken };
   }
 }
+
+// 2. Create an instance of your auth provider
+const myAuthProvider = new MyAppAuthProvider();
+
+// 3. Set the delegate on the NuggetSDK instance
+nuggetSDK.setAuthDelegate(myAuthProvider);
 ```
+Make sure to set the authentication delegate before performing any operations that require user authentication.
 
-### Deep Linking
+### 4. Deep Linking
 
-The SDK supports deep linking functionality:
+The SDK provides methods to check if it can handle a deeplink and to open the SDK with a specific deeplink.
 
 ```typescript
-// Check if a deeplink can be opened
-const canOpen = await nuggetModule.canOpenDeeplink(deeplinkUrl);
+const deeplinkUrl = "some-chat-deeplink"; // Replace with your deeplink
 
-// Open the SDK with a deeplink
-if (canOpen) {
-  const result = await nuggetModule.openNuggetSDK(deeplinkUrl);
-}
-```
+async function handleDeeplink() {
+  try {
+    // Check if the SDK can open the deeplink
+    const canOpen = await nuggetSDK.canOpenDeeplink(deeplinkUrl);
 
-### Event Handling
-
-Subscribe to SDK events:
-
-```typescript
-const eventSubscription = nuggetModule.addListener('OnNativeRequest', 
-  async (event) => {
-    // Handle events
+    if (canOpen) {
+      console.log("Nugget SDK can open this deeplink.");
+      // Open the Nugget SDK with the deeplink
+      const openedSuccessfully = await nuggetSDK.openNuggetSDK(deeplinkUrl);
+      if (openedSuccessfully) {
+        console.log("Nugget SDK opened successfully with deeplink.");
+      } else {
+        console.log("Failed to open Nugget SDK with deeplink.");
+      }
+    } else {
+      console.log("Nugget SDK cannot open this deeplink.");
+    }
+  } catch (error) {
+    console.error("Error handling deeplink with Nugget SDK:", error);
   }
-);
+}
 
-// Clean up when component unmounts
-nuggetModule.cleanup();
+handleDeeplink();
 ```
 
 ## API Reference
 
-### NuggetModule Methods
+This section details the main classes, interfaces, and methods provided by the Nugget React Native SDK.
 
-| Method | Description | Parameters | Return Type |
-|--------|-------------|------------|-------------|
-| `initialize()` | Initializes the SDK | None | void |
-| `getAuthInfo()` | Provides authentication information | None | Promise<Object> |
-| `refreshAuthInfo()` | Refreshes authentication tokens | None | Promise<Object> |
-| `canOpenDeeplink()` | Checks if a deeplink can be opened | `deeplink: string` | Promise<boolean> |
-| `openNuggetSDK()` | Opens the SDK with a deeplink | `deeplink: string` | Promise<string> |
-| `cleanup()` | Removes event listeners | None | void |
+### `NuggetSDK`
 
-### Events
+The primary class for interacting with the SDK.
 
-| Event Name | Description | Payload |
-|------------|-------------|---------|
-| `OnNativeRequest` | Triggered when native code requests data | `{ method: string, payload: any }` |
+#### Methods
+
+| Method                                      | Description                                                                                                | Parameters                                         | Return Type                            |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | -------------------------------------- |
+| `static getInstance(config: NuggetJumborConfiguration)` | Gets the singleton instance of the `NuggetSDK`. Initializes it if it's the first call.                 | `config: NuggetJumborConfiguration`              | `NuggetSDK`                            |
+| `setAuthDelegate(delegate: NuggetAuthProvider)` | Sets the authentication delegate responsible for providing and refreshing user authentication tokens.    | `delegate: NuggetAuthProvider`                   | `void`                                 |
+| `canOpenDeeplink(deeplink: string)`         | Checks if the Nugget SDK can handle the given deeplink.                                                    | `deeplink: string`                               | `Promise<boolean>`                     |
+| `openNuggetSDK(deeplink: string)`           | Opens the Nugget SDK with the specified deeplink.                                                          | `deeplink: string`                               | `Promise<boolean>`                     |
+
+### Interfaces
+
+#### `NuggetJumborConfiguration`
+Configuration object required when initializing the `NuggetSDK`.
+
+| Property    | Type     | Description                       |
+| ----------- | -------- | --------------------------------- |
+| `nameSpace` | `string` | Your application's unique namespace. |
+
+#### `NuggetAuthProvider`
+Interface for the authentication delegate your app must provide.
+
+| Method              | Description                                                         | Parameters | Return Type                          |
+| ------------------- | ------------------------------------------------------------------- | ---------- | ------------------------------------ |
+| `getAuthInfo()`     | Provides current user authentication information (access token).    | None       | `Promise<NuggetAuthUserInfo>`        |
+| `refreshAuthInfo()` | Called by the SDK to refresh authentication information.             | None       | `Promise<NuggetAuthUserInfo>`        |
+
+#### `NuggetAuthUserInfo`
+Object representing user authentication information.
+
+| Property      | Type     | Description                |
+| ------------- | -------- | -------------------------- |
+| `accessToken` | `string` | The user's access token.   |
 
 ## Troubleshooting
 
@@ -182,5 +187,5 @@ Common issues and their solutions:
    - Verify URL format
    - Check canOpenDeeplink() before opening
 
-For additional support, please contact our support team or visit our documentation portal.
+For additional support, please contact nugget team.
 
