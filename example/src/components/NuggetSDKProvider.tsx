@@ -1,7 +1,7 @@
 
-import React, { createContext, useContext, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 import { NuggetSDK } from 'nugget-rn';
-import type { NuggetAuthProvider, NuggetAuthUserInfo, NuggetJumborConfiguration } from 'nugget-rn';
+import type { NuggetAuthProvider, NuggetAuthUserInfo, NuggetChatBusinessContext, NuggetJumborConfiguration } from 'nugget-rn';
 
 // Define the context shape
 interface NuggetSDKContextType {
@@ -46,8 +46,19 @@ export const NuggetSDKProvider: React.FC<NuggetSDKProviderProps> = ({
 }) => {
     const sdk = useMemo(() => {
         const sdkConfig: NuggetJumborConfiguration = { nameSpace };
-        console.log("NuggetSDKProvider", sdkConfig);
-        const nuggetSDKInstance = NuggetSDK.getInstance(sdkConfig);
+        const chatSupportBusinessContext: NuggetChatBusinessContext = {
+            channelHandle: 'channelHandle',
+            ticketGroupingId: 'ticketGroupingId-goes-here',
+            ticketProperties: {
+                'ticketProperty1': ['value1', 'value2'],
+                'ticketProperty2': ['value3', 'value4']
+            },
+            botProperties: {
+                'botProperty1': ['value5', 'value6'],
+                'botProperty2': ['value7', 'value8']
+            }
+        };
+        const nuggetSDKInstance = NuggetSDK.getInstance(sdkConfig, chatSupportBusinessContext);
         const authDelegate = new NuggetAuthProviderImpl(initialAuthToken);
         nuggetSDKInstance.setAuthDelegate(authDelegate);
         return nuggetSDKInstance;

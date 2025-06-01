@@ -9,7 +9,7 @@ RCT_EXTERN_METHOD(canOpenDeeplink:(NSString *)deeplink callback:(RCTResponseSend
 
 RCT_EXTERN_METHOD(openNuggetSDK:(NSString *)deeplink callback:(RCTResponseSenderBlock)callback)
 
-RCT_EXTERN_METHOD(initializeNuggetFactory:(NSDictionary *)chatBusinessContext)
+RCT_EXTERN_METHOD(initializeNuggetFactory:(NSDictionary *)sdkConfiguration chatSupportBusinessContext:(NSDictionary *)chatSupportBusinessContext)
 
 RCT_EXTERN_METHOD(onJsResponse:(NSString *)method result:(id)result)
 

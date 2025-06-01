@@ -50,18 +50,57 @@ import { NuggetSDK, NuggetJumborConfiguration, NuggetAuthProvider, NuggetAuthUse
 
 ### 2. Initializing the SDK
 
-To use the SDK, you need to obtain an instance of the `NuggetSDK`. This is done by calling the static `getInstance` method with your SDK configuration. The configuration requires a `nameSpace`.
+To use the SDK, you need to obtain an instance of the `NuggetSDK`. This is done by calling the static `getInstance` method. This method takes two arguments:
+1.  `sdkConfiguration`: An object of type `NuggetJumborConfiguration` which requires a `nameSpace`.
+2.  `chatSupportBusinessContext`: An object of type `NuggetChatBusinessContext` which can be used to provide additional, optional context for chat interactions.
+
+The `NuggetSDK` is a singleton; calling `getInstance` multiple times with the same initial configuration parameters will return the same instance. The configuration (including `sdkConfiguration` and `chatSupportBusinessContext`) is applied only upon the first call when the instance is created.
+
+**NuggetJumborConfiguration Interface:**
+```typescript
+export interface NuggetJumborConfiguration {
+  nameSpace: string; // Your application's unique namespace
+}
+```
+
+**NuggetChatBusinessContext Interface (all properties are optional):**
+```typescript
+export interface NuggetChatBusinessContext {
+    channelHandle?: string;
+    ticketGroupingId?: string;
+    ticketProperties?: { [key: string]: string[] };
+    botProperties?: { [key: string]: string[] };
+}
+```
+This context helps in tailoring the chat experience, for example, by routing tickets correctly or providing bots with relevant user data. If you don't need to specify any business context, you can pass an empty object `{}` for the second argument.
+
+**Example of initializing the SDK:**
 
 ```typescript
-// Define your SDK configuration
+// 1. Define your SDK configuration
 const nuggetSDKConfig: NuggetJumborConfiguration = {
   nameSpace: 'your-app-namespace' // Replace with your application's unique namespace
 };
 
-// Get an instance of the NuggetSDK
-const nuggetSDK = NuggetSDK.getInstance(nuggetSDKConfig);
+// 2. Define optional chat business context
+const chatContext: NuggetChatBusinessContext = {
+  channelHandle: "someChannelHandleValue", // Optional: specific channel for the interaction
+  ticketGroupingId: "someTicketGroupingIdValue", // Optional: identifier for grouping tickets
+  ticketProperties: { // Optional: custom properties for the ticket
+    "someTicketProperties": ["someTicketPropertiesValue"]
+  },
+  botProperties: { // Optional: custom properties for bot interactions
+    "someBotProperties": ["someBotPropertiesValue"]
+  }
+};
+
+// 3. Get an instance of the NuggetSDK
+const nuggetSDK = NuggetSDK.getInstance(nuggetSDKConfig, chatContext);
+
+// Alternatively, if no specific chat context is needed at initialization:
+// const nuggetSDKWithNoChatContext = NuggetSDK.getInstance(nuggetSDKConfig, {});
 ```
-The `NuggetSDK` is a singleton; calling `getInstance` multiple times will return the same instance. The configuration is applied only upon the first call.
+Internally, `NuggetSDK.getInstance` calls `NuggetPlugin.initializeNuggetFactory(config, chatSupportBusinessContext)` on the native side during the first initialization.
 
 ### 3. Setting up Authentication
 
@@ -98,7 +137,7 @@ nuggetSDK.setAuthDelegate(myAuthProvider);
 ```
 Make sure to set the authentication delegate before performing any operations that require user authentication.
 
-### 4. Deep Linking
+### 4. DeepLink Handeling
 
 The SDK provides methods to check if it can handle a deeplink and to open the SDK with a specific deeplink.
 
@@ -142,7 +181,7 @@ The primary class for interacting with the SDK.
 
 | Method                                      | Description                                                                                                | Parameters                                         | Return Type                            |
 | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | -------------------------------------- |
-| `static getInstance(config: NuggetJumborConfiguration)` | Gets the singleton instance of the `NuggetSDK`. Initializes it if it's the first call.                 | `config: NuggetJumborConfiguration`              | `NuggetSDK`                            |
+| `static getInstance(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext)` | Gets the singleton instance of the `NuggetSDK`. Initializes it if it's the first call.                 | `config: NuggetJumborConfiguration`, `chatSupportBusinessContext: NuggetChatBusinessContext`              | `NuggetSDK`                            |
 | `setAuthDelegate(delegate: NuggetAuthProvider)` | Sets the authentication delegate responsible for providing and refreshing user authentication tokens.    | `delegate: NuggetAuthProvider`                   | `void`                                 |
 | `canOpenDeeplink(deeplink: string)`         | Checks if the Nugget SDK can handle the given deeplink.                                                    | `deeplink: string`                               | `Promise<boolean>`                     |
 | `openNuggetSDK(deeplink: string)`           | Opens the Nugget SDK with the specified deeplink.                                                          | `deeplink: string`                               | `Promise<boolean>`                     |

@@ -47,15 +47,21 @@ export interface NuggetEventBridge {
     OnNativeRequest: NativeRequestEvent;
 }
 
+export interface NuggetChatBusinessContext {
+    channelHandle?: string;
+    ticketGroupingId?: string;
+    ticketProperties?: { [key: string]: string[] };
+    botProperties?: { [key: string]: string[] };
+}
+
 export class NuggetSDK {
     private static instance: NuggetSDK | null = null;
     private config: NuggetJumborConfiguration;
     private authDelegate: NuggetAuthProvider | null = null;
-
     private eventEmitter: NativeEventEmitter;
     private eventSubscription: any;
 
-    private constructor(config: NuggetJumborConfiguration) {
+    private constructor(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext) {
         this.config = config;
         this.eventEmitter = new NativeEventEmitter(NuggetPlugin);
 
@@ -90,21 +96,7 @@ export class NuggetSDK {
                 }
             }
         );
-        NuggetPlugin.initializeNuggetFactory(config);
-    }
-
-    public static getInstance(config: NuggetJumborConfiguration): NuggetSDK {
-
-        if (!NuggetSDK.instance) {
-            NuggetSDK.instance = new NuggetSDK(config);
-        }
-        // If called again with a new config, the existing instance's config is not updated.
-        // This is typical for basic singletons: initialize once.
-        return NuggetSDK.instance;
-    }
-
-    public setAuthDelegate(delegate: NuggetAuthProvider) {
-        this.authDelegate = delegate;
+        NuggetPlugin.initializeNuggetFactory(config, chatSupportBusinessContext);
     }
 
     private async getAuthInfo(): Promise<{ [key: string]: any }> {
@@ -126,6 +118,21 @@ export class NuggetSDK {
     private getConfiguration(): { [key: string]: any } {
         return { ...this.config };
     }
+    
+    public static getInstance(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext): NuggetSDK {
+
+        if (!NuggetSDK.instance) {
+            NuggetSDK.instance = new NuggetSDK(config, chatSupportBusinessContext);
+        }
+        // If called again with a new config, the existing instance's config is not updated.
+        // This is typical for basic singletons: initialize once.
+        return NuggetSDK.instance;
+    }
+
+    public setAuthDelegate(delegate: NuggetAuthProvider) {
+        this.authDelegate = delegate;
+    }
+
 
     /**
      * Checks if the SDK can handle the given deeplink

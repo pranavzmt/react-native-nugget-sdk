@@ -8,15 +8,16 @@ struct ClientSideNuggetChatBusinessContext: NuggetChatBusinessContext {
   var ticketProperties: [String : [String]]?
   var botProperties: [String : [String]]?
   
-  init?(channelHandle: String? = nil, ticketGroupingId: String? = nil, ticketProperties: [String : [String]]? = nil, botProperties: [String : [String]]? = nil) {
-    guard channelHandle != nil || ticketGroupingId != nil || ticketProperties != nil || botProperties != nil else { return nil }
+  init(channelHandle: String? = nil,
+       ticketGroupingId: String? = nil,
+       ticketProperties: [String : [String]]? = nil,
+       botProperties: [String : [String]]? = nil) {
     self.channelHandle = channelHandle
     self.ticketGroupingId = ticketGroupingId
     self.ticketProperties = ticketProperties
     self.botProperties = botProperties
   }
 }
-
 
 class ClientSideNuggetChatBusinessContextDelegate: NuggetBusinessContextProviderDelegate {
   
@@ -25,18 +26,20 @@ class ClientSideNuggetChatBusinessContextDelegate: NuggetBusinessContextProvider
     self.params = params
   }
   
-  private func createChatSupportBusinessContextFromDictionary() -> NuggetChatBusinessContext? {
-    guard let params else { return nil }
+  private func createChatSupportBusinessContextFromDictionary() -> NuggetChatBusinessContext {
+    guard let params else { return ClientSideNuggetChatBusinessContext() }
     let channelHandle: String? = params["channelHandle"] as? String
     let ticketGroupingId: String? = params["ticketGroupingId"] as? String
     let ticketProperties: [String: [String]]? = params["ticketProperties"] as? [String: [String]]
     let botProperties: [String: [String]]? = params["botProperties"] as? [String: [String]]
-    return ClientSideNuggetChatBusinessContext(channelHandle: channelHandle, ticketGroupingId: ticketGroupingId, ticketProperties: ticketProperties, botProperties: botProperties)
+    return ClientSideNuggetChatBusinessContext(channelHandle: channelHandle,
+                                               ticketGroupingId: ticketGroupingId,
+                                               ticketProperties: ticketProperties,
+                                               botProperties: botProperties)
   }
   
   func chatSupportBusingessContext() -> NuggetChatBusinessContext {
-    let chatBusinessContext = createChatSupportBusinessContextFromDictionary()!
-    return chatBusinessContext
+    return createChatSupportBusinessContextFromDictionary()
   }
 }
 
@@ -44,10 +47,7 @@ class ClientSideNuggetChatBusinessContextDelegate: NuggetBusinessContextProvider
 @objc(NuggetRN)
 class NuggetRN: RCTEventEmitter {
   var pendingCompletions: [String: (Any) -> Void] = [:]
-  
   var nuggetFactory: NuggetFactory?
-  let chatDeeplink =
-  "stashfin://unified-support/conversation?flowType=ticketing&omniTicketingFlow=true"
   
   // Required for RCTEventEmitter
   override static func requiresMainQueueSetup() -> Bool {
@@ -66,18 +66,21 @@ class NuggetRN: RCTEventEmitter {
   
   @objc
   func canOpenDeeplink(_ deeplink: String, callback: @escaping RCTResponseSenderBlock) {
-    let canOpenDeeplink = NuggetFactory.canOpenDeeplink(deeplink: chatDeeplink)
+    let canOpenDeeplink = NuggetFactory.canOpenDeeplink(deeplink: deeplink)
+    callback([["canOpenDeeplink": canOpenDeeplink]])
   }
   
   var clientSideNuggetChatBusinessContextDelegate :ClientSideNuggetChatBusinessContextDelegate?
-
+  var clientNuggetSDkConfiguration :NuggetSDkConfigurationDelegate = ClientNuggetSDkConfiguration(configuration: [:])
+  
   @objc
-  func initializeNuggetFactory(_ chatBusinessContext: [String: Any]) {
-    clientSideNuggetChatBusinessContextDelegate = ClientSideNuggetChatBusinessContextDelegate(params: chatBusinessContext)
+  func initializeNuggetFactory(_ sdkConfiguration: [String: Any], chatSupportBusinessContext: [String: Any]) {
+    clientNuggetSDkConfiguration = ClientNuggetSDkConfiguration(configuration: sdkConfiguration)
+    clientSideNuggetChatBusinessContextDelegate = ClientSideNuggetChatBusinessContextDelegate(params: chatSupportBusinessContext)
     nuggetFactory = NuggetSDK.initializeNuggetFactory(
       authDelegate: self,
       notificationDelegate: .init(),
-      sdkConfigurationDelegate: self,
+      sdkConfigurationDelegate: clientNuggetSDkConfiguration,
       chatBusinessContextDelegate: nil)
   }
   
@@ -88,15 +91,17 @@ class NuggetRN: RCTEventEmitter {
       let rootViewController = UIApplication.shared.delegate?.window??.rootViewController
       
       if let rootViewController, let viewController {
+        viewController.modalPresentationStyle = .fullScreen
         rootViewController.present(viewController, animated: true)
-        callback([["nuggetSDKResult": "nuggetSDKResult"]])
+        callback([["nuggetSDKResult": true]])
         return
       }
       
       let windowSceneVC = self.getRootViewControllerFromWindowScene()
       if let windowSceneVC, let viewController {
+        viewController.modalPresentationStyle = .fullScreen
         windowSceneVC.present(viewController, animated: true)
-        callback([["nuggetSDKResult": "nuggetSDKResult"]])
+        callback([["nuggetSDKResult": true]])
         return
       }
     }
@@ -159,7 +164,7 @@ extension NuggetRN: NuggetAuthProviderDelegate {
     requestValueFromJS(method: "requiresAuthInfo", payload: [:]) { result in
       guard let passesValue = result as? [String: Any],
             let authInfo = passesValue["success"] as? [String: Any],
-        let authInfo = self.createAuthObjectFromDictionary(dictionary: authInfo) else {
+            let authInfo = self.createAuthObjectFromDictionary(dictionary: authInfo) else {
         completion(nil, NSError(domain: "NuggetRN", code: 0, userInfo: nil))
         return
       }
@@ -173,12 +178,13 @@ extension NuggetRN: NuggetAuthProviderDelegate {
     requestValueFromJS(method: "requestRefreshAuthInfo", payload: [:]) { result in
       guard let passesValue = result as? [String: Any],
             let authInfo = passesValue["success"] as? [String: Any],
-        let authInfo = self.createAuthObjectFromDictionary(dictionary: authInfo) else {
+            let authInfo = self.createAuthObjectFromDictionary(dictionary: authInfo) else {
         completion(nil, NSError(domain: "NuggetRN", code: 0, userInfo: nil))
         return
       }
       completion(authInfo, nil)
-    }  }
+    }
+  }
   
   struct ClientAuthToken: NuggetAuthUserInfo {
     var clientID: Int = 1
@@ -194,28 +200,21 @@ extension NuggetRN: NuggetAuthProviderDelegate {
 }
 
 // MARK: SDK config requirements
-extension NuggetRN: NuggetSDkConfigurationDelegate {
+private struct ClientNuggetSDkConfiguration: NuggetSDkConfigurationDelegate {
   
-  private func createSDKCoonfigObjectFromDictionary(
-    dictionary: [String: Any]?
-  ) -> NuggetJumborConfiguration? {
-    guard let accessToken = dictionary?["nameSpace"] as? String else { return nil }
-    return NuggetJumborConfiguration(nameSpace: accessToken)
+  private let configuration: [String: Any]?
+  init(configuration: [String: Any]) {
+    self.configuration = configuration
+  }
+  
+  private func createSDKConfigObjectFromDictionary( dictionary: [String: Any]?) -> NuggetJumborConfiguration {
+    let nameSpace = dictionary?["nameSpace"] as? String ?? ""
+    let jumboUrl = dictionary?["jumboUrl"] as? String
+    return NuggetJumborConfiguration(nameSpace: nameSpace, jumboUrl: jumboUrl)
   }
   
   func jumboConfiguration(completion: @escaping (NuggetJumborConfiguration) -> Void) {
-    let defaultJumboConfig = NuggetJumborConfiguration(nameSpace: "rn-namespace")
-    
-    requestValueFromJS(
-      method: "getJumboConfig",
-      payload: [:], completion: { result in
-        if let passedValues = result as? [String: Any],
-           let configObject = self.createSDKCoonfigObjectFromDictionary(dictionary: passedValues) {
-          completion(configObject)
-        } else {
-          completion(defaultJumboConfig)
-        }
-      }
-    )
+    let configObject = self.createSDKConfigObjectFromDictionary(dictionary: configuration)
+    completion(configObject)
   }
 }
