@@ -56,11 +56,18 @@ export interface NuggetChatBusinessContext {
 
 export class NuggetSDK {
     private static instance: NuggetSDK | null = null;
+    static #pendingNotificationToken: string | null = null;
+    static #pendingNotificationPermissionStatus: boolean | null = null;
     private config: NuggetJumborConfiguration;
     private authDelegate: NuggetAuthProvider | null = null;
     private eventEmitter: NativeEventEmitter;
     private eventSubscription: any;
 
+    /**
+     * Constructor for the NuggetSDK class
+     * @param config - The configuration for the NuggetSDK
+     * @param chatSupportBusinessContext - The chat support business context
+     */
     private constructor(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext) {
         this.config = config;
         this.eventEmitter = new NativeEventEmitter(NuggetPlugin);
@@ -118,7 +125,13 @@ export class NuggetSDK {
     private getConfiguration(): { [key: string]: any } {
         return { ...this.config };
     }
-    
+
+    /**
+     * Gets the instance of the NuggetSDK class
+     * @param config - The configuration for the NuggetSDK
+     * @param chatSupportBusinessContext - The chat support business context
+     * @returns The instance of the NuggetSDK class
+     */
     public static getInstance(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext): NuggetSDK {
 
         if (!NuggetSDK.instance) {
@@ -173,7 +186,18 @@ export class NuggetSDK {
         return new Promise((resolve) => {
             try {
                 NuggetPlugin.openNuggetSDK(deeplink, (result: any) => {
-                    resolve(!!result?.nuggetSDKResult);
+                    let isOpenedSuccessfully = !!result?.nuggetSDKResult;
+                    if (isOpenedSuccessfully) {
+                        if (NuggetSDK.#pendingNotificationToken !== null) {
+                            NuggetPlugin.updateNotificationToken(NuggetSDK.#pendingNotificationToken);
+                            NuggetSDK.#pendingNotificationToken = null;
+                        }
+                        if (NuggetSDK.#pendingNotificationPermissionStatus !== null) {
+                            NuggetPlugin.updateNotificationPermissionStatus(NuggetSDK.#pendingNotificationPermissionStatus);
+                            NuggetSDK.#pendingNotificationPermissionStatus = null;
+                        }
+                    }
+                    resolve(isOpenedSuccessfully);
                 });
             } catch (error) {
                 console.error('Error opening Nugget SDK:', error);
@@ -181,4 +205,30 @@ export class NuggetSDK {
             }
         });
     }
+
+    // change them to static methods
+    /**
+     * Updates the notification token
+     * @param token - The notification token
+     */
+    public static updateNotificationToken(token: string) {
+        if (NuggetSDK.instance) {
+            NuggetPlugin.updateNotificationToken(token);
+        } else {
+            NuggetSDK.#pendingNotificationToken = token;
+        }
+    }
+
+    /**
+     * Updates the notification permission status
+     * @param notificationAllowed - The notification permission status
+     */
+    public static updateNotificationPermissionStatus(notificationAllowed: boolean) {
+        if (NuggetSDK.instance) {
+            NuggetPlugin.updateNotificationPermissionStatus(notificationAllowed);
+        } else {
+            NuggetSDK.#pendingNotificationPermissionStatus = notificationAllowed;
+        }
+    }
+
 }

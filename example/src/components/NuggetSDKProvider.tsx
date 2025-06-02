@@ -58,6 +58,10 @@ export const NuggetSDKProvider: React.FC<NuggetSDKProviderProps> = ({
                 'botProperty2': ['value7', 'value8']
             }
         };
+
+        NuggetSDK.updateNotificationToken('some-token-goes-here');
+        NuggetSDK.updateNotificationPermissionStatus(true);
+
         const nuggetSDKInstance = NuggetSDK.getInstance(sdkConfig, chatSupportBusinessContext);
         const authDelegate = new NuggetAuthProviderImpl(initialAuthToken);
         nuggetSDKInstance.setAuthDelegate(authDelegate);

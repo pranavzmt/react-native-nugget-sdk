@@ -72,6 +72,7 @@ class NuggetRN: RCTEventEmitter {
   
   var clientSideNuggetChatBusinessContextDelegate :ClientSideNuggetChatBusinessContextDelegate?
   var clientNuggetSDkConfiguration :NuggetSDkConfigurationDelegate = ClientNuggetSDkConfiguration(configuration: [:])
+  var nuggetPushNotificationsListener: NuggetPushNotificationsListener = NuggetPushNotificationsListener()
   
   @objc
   func initializeNuggetFactory(_ sdkConfiguration: [String: Any], chatSupportBusinessContext: [String: Any]) {
@@ -79,9 +80,20 @@ class NuggetRN: RCTEventEmitter {
     clientSideNuggetChatBusinessContextDelegate = ClientSideNuggetChatBusinessContextDelegate(params: chatSupportBusinessContext)
     nuggetFactory = NuggetSDK.initializeNuggetFactory(
       authDelegate: self,
-      notificationDelegate: .init(),
+      notificationDelegate: nuggetPushNotificationsListener,
       sdkConfigurationDelegate: clientNuggetSDkConfiguration,
       chatBusinessContextDelegate: nil)
+  }
+  
+  @objc
+  func updateNotificationToken(_ token: String) {
+    nuggetPushNotificationsListener.tokenUpdated(to: token)
+  }
+  
+  @objc
+  func updateNotificationPermissionStatus(_ notificationAllowed: Bool) {
+    let notificationPermissionStatus: UNAuthorizationStatus = notificationAllowed ? .authorized : .denied
+    nuggetPushNotificationsListener.permissionStatusUpdated(to: notificationPermissionStatus)
   }
   
   @objc
@@ -130,7 +142,6 @@ class NuggetRN: RCTEventEmitter {
   func requestValueFromJS(
     method: String, payload: [String: Any], completion: @escaping (Any) -> Void
   ) {
-    print("requestValueFromJS", method, payload)
     pendingCompletions[method] = completion
     sendEvent(
       withName: "OnNativeRequest",
@@ -158,9 +169,7 @@ extension NuggetRN: NuggetAuthProviderDelegate {
     return ClientAuthToken(accessToken: accessToken)
   }
   
-  func authManager(
-    requiresAuthInfo completion: @escaping ((NuggetAuthUserInfo)?, (Error)?) -> Void
-  ) {
+  func authManager(requiresAuthInfo completion: @escaping ((NuggetAuthUserInfo)?, (Error)?) -> Void) {
     requestValueFromJS(method: "requiresAuthInfo", payload: [:]) { result in
       guard let passesValue = result as? [String: Any],
             let authInfo = passesValue["success"] as? [String: Any],
@@ -172,9 +181,7 @@ extension NuggetRN: NuggetAuthProviderDelegate {
     }
   }
   
-  func authManager(
-    requestRefreshAuthInfo completion: @escaping ((any NuggetAuthUserInfo)?, (any Error)?) -> Void
-  ) {
+  func authManager(requestRefreshAuthInfo completion: @escaping ((any NuggetAuthUserInfo)?, (any Error)?) -> Void) {
     requestValueFromJS(method: "requestRefreshAuthInfo", payload: [:]) { result in
       guard let passesValue = result as? [String: Any],
             let authInfo = passesValue["success"] as? [String: Any],

@@ -13,4 +13,8 @@ RCT_EXTERN_METHOD(initializeNuggetFactory:(NSDictionary *)sdkConfiguration chatS
 
 RCT_EXTERN_METHOD(onJsResponse:(NSString *)method result:(id)result)
 
+RCT_EXTERN_METHOD(updateNotificationToken:(NSString *)token)
+
+RCT_EXTERN_METHOD(updateNotificationPermissionStatus:(BOOL)notificationAllowed)
+
 @end

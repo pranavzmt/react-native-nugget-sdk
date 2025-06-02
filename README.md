@@ -169,6 +169,28 @@ async function handleDeeplink() {
 handleDeeplink();
 ```
 
+### 5. Handling Notifications
+
+The SDK provides static methods to update the push notification token and permission status. These methods can be called even before the SDK is fully initialized with `NuggetSDK.getInstance()`. If called before initialization, the token and permission status are cached and automatically sent to the native Nugget SDK once `openNuggetSDK()` is successfully called.
+
+#### Updating Notification Token and Permission Status
+
+To inform the Nugget SDK about the device's push notification token (e.g., FCM token) and the user's push notification permission status, use the `updateNotificationToken` and `updateNotificationPermissionStatus` static methods respectively:
+
+```typescript
+import { NuggetSDK } from 'nugget-sdk';
+
+// Update the notification token
+const pushNotificationToken = "your-device-push-token"; // Replace with the actual token
+NuggetSDK.updateNotificationToken(pushNotificationToken);
+
+// Update the notification permission status
+// Example: User has granted notification permissions
+const hasNotificationPermission = true;
+NuggetSDK.updateNotificationPermissionStatus(hasNotificationPermission);
+```
+It's crucial to keep the Nugget SDK updated with the current notification token and permission status to ensure correct behavior regarding push notifications.
+
 ## API Reference
 
 This section details the main classes, interfaces, and methods provided by the Nugget React Native SDK.
@@ -185,6 +207,8 @@ The primary class for interacting with the SDK.
 | `setAuthDelegate(delegate: NuggetAuthProvider)` | Sets the authentication delegate responsible for providing and refreshing user authentication tokens.    | `delegate: NuggetAuthProvider`                   | `void`                                 |
 | `canOpenDeeplink(deeplink: string)`         | Checks if the Nugget SDK can handle the given deeplink.                                                    | `deeplink: string`                               | `Promise<boolean>`                     |
 | `openNuggetSDK(deeplink: string)`           | Opens the Nugget SDK with the specified deeplink.                                                          | `deeplink: string`                               | `Promise<boolean>`                     |
+| `static updateNotificationToken(token: string)` | Updates the push notification token. Caches token if SDK not initialized, sends on `openNuggetSDK`.      | `token: string`                                    | `void`                                 |
+| `static updateNotificationPermissionStatus(notificationAllowed: boolean)` | Updates the notification permission status. Caches status if SDK not initialized, sends on `openNuggetSDK`. | `notificationAllowed: boolean`                   | `void`                                 |
 
 ### Interfaces
 
