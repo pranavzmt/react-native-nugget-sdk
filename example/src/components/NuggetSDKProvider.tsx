@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useMemo } from 'react';
-import { NuggetSDK } from 'nugget-rn';
-import type { NuggetAuthProvider, NuggetAuthUserInfo, NuggetChatBusinessContext, NuggetJumborConfiguration } from 'nugget-rn';
+import { NuggetSDK } from 'nugget-sdk';
+import type { NuggetAuthProvider, NuggetAuthUserInfo, NuggetChatBusinessContext, NuggetJumborConfiguration } from 'nugget-sdk';
 
 // Define the context shape
 interface NuggetSDKContextType {

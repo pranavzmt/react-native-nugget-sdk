@@ -1,12 +1,10 @@
-# Resolve react_native_pods.rb with node to allow for hoisting
-require Pod::Executable.execute_command('node', ['-p',
-  'require.resolve(
-    "react-native/scripts/react_native_pods.rb",
-    {paths: [process.argv[1]]},
-  )', __dir__]).strip
+
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 platform :ios, '14.0'
 prepare_react_native_project!
+
 # If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
 # because `react-native-flipper` depends on (FlipperKit,...) that will be excluded
 #
@@ -16,37 +14,71 @@ prepare_react_native_project!
 #   dependencies: {
 #     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } } : {}),
 # ```
-# flipper_config = ENV['NO_FLIPPER'] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
-
 flipper_config = FlipperConfiguration.disabled
 use_frameworks! :linkage => :static
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
 
 target 'NuggetRNExample' do
   config = use_native_modules!
 
-  pod 'NuggetSDK', :git => 'https://github.com/BudhirajaRajesh/NuggetSDK.git', :tag => '0.1.3'
-  # pod 'NuggetSDK', :path => '/Users/singh.pranav@zomato.com/Desktop/REACT-NATIVE/LocalNuggetSDK/nugget-sdk-ios'
+  # Flags change depending on the env values.
+  flags = get_default_flags()
+
+  pod 'Google-Maps-iOS-Utils', :git => 'https://github.com/Simon-TechForm/google-maps-ios-utils.git', :branch => 'feat/support-apple-silicon'
+
+rn_maps_path = '../node_modules/react-native-maps'
+pod 'react-native-google-maps', :path => rn_maps_path
+
   use_react_native!(
     :path => config[:reactNativePath],
+    # Hermes is now enabled by default. Disable by setting this flag to false.
+    # Upcoming versions of React Native may rely on get_default_flags(), but
+    # we make it explicit here to aid in the React Native upgrade process.
+    :hermes_enabled => false,
+    :fabric_enabled => flags[:fabric_enabled],
     # Enables Flipper.
     #
     # Note that if you have use_frameworks! enabled, Flipper will not work and
     # you should disable the next line.
-    # :flipper_configuration => FlipperConfiguration.enabled,
+    :flipper_configuration => flipper_config,
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  #pod 'Amplitude', '~> 8.14'
+  pod 'PINRemoteImage', '3.0.1'
+  pod 'PINCache', '3.0.1'
+  pod 'react-native-twilio-video-webrtc', path: '../node_modules/react-native-twilio-video-webrtc'
+  pod 'RNAnimatedSplash', :path => '../node_modules/react-native-animated-splash'
+  pod 'RNZohoSalesIQ', :path => '../node_modules/react-native-zohosalesiq-mobilisten'
+  pod 'NuggetSDK', :git => 'https://github.com/Zomato-Nugget/nugget-sdk-ios', :tag => '0.0.8'
+  # pod 'react-native-color-matrix-image-filters', :path => '../node_modules/react-native-color-matrix-image-filters/react-native-color-matrix-image-filters.podspec'
+  pod "CleverTap-iOS-SDK"
   target 'NuggetRNExampleTests' do
     inherit! :complete
     # Pods for testing
   end
 
   post_install do |installer|
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings["DEVELOPMENT_TEAM"] = "AU9UJ3DSGS"
+        # https://github.com/facebook/react-native/issues/37748
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', '_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION']
+      end
+    end
     react_native_post_install(
       installer,
-      config[:reactNativePath],
+      # Set `mac_catalyst_enabled` to `true` in order to apply patches
+      # necessary for Mac Catalyst builds
       :mac_catalyst_enabled => false
     )
+    __apply_Xcode_12_5_M1_post_install_workaround(installer)
   end
+
 end

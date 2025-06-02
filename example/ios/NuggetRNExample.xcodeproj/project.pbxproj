@@ -11,9 +11,9 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		5FEBD522995225BC3C364F15 /* Pods_NuggetRNExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C68798EB94471FC540438D7 /* Pods_NuggetRNExample.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		9A6DCC6828FD7323C3462C17 /* Pods_NuggetRNExample_NuggetRNExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 970D82C9951002A255CE8CD1 /* Pods_NuggetRNExample_NuggetRNExampleTests.framework */; };
+		C31F4A725FC9FAB7EFA9121F /* Pods_NuggetRNExample_NuggetRNExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1037AEA64E6EAF601E5363B3 /* Pods_NuggetRNExample_NuggetRNExampleTests.framework */; };
+		DCE3553F81A26BAC0A9F3561 /* Pods_NuggetRNExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45D21793FD3C5AAA7D3DD66 /* Pods_NuggetRNExample.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,21 +30,21 @@
 		00E356EE1AD99517003FC87E /* NuggetRNExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NuggetRNExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* NuggetRNExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NuggetRNExampleTests.m; sourceTree = "<group>"; };
+		1037AEA64E6EAF601E5363B3 /* Pods_NuggetRNExample_NuggetRNExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NuggetRNExample_NuggetRNExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* NuggetRNExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NuggetRNExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = NuggetRNExample/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = NuggetRNExample/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = NuggetRNExample/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = NuggetRNExample/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = NuggetRNExample/main.m; sourceTree = "<group>"; };
-		1D5B26BA7EA069B84D234C81 /* Pods-NuggetRNExample-NuggetRNExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NuggetRNExample-NuggetRNExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-NuggetRNExample-NuggetRNExampleTests/Pods-NuggetRNExample-NuggetRNExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
-		2C68798EB94471FC540438D7 /* Pods_NuggetRNExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NuggetRNExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		497AB800C2B7EF1557F06B24 /* Pods-NuggetRNExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NuggetRNExample.debug.xcconfig"; path = "Target Support Files/Pods-NuggetRNExample/Pods-NuggetRNExample.debug.xcconfig"; sourceTree = "<group>"; };
+		17558D6A04D1B3246218CBA1 /* Pods-NuggetRNExample-NuggetRNExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NuggetRNExample-NuggetRNExampleTests.release.xcconfig"; path = "Target Support Files/Pods-NuggetRNExample-NuggetRNExampleTests/Pods-NuggetRNExample-NuggetRNExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+		4B36EFCA79E24BDFF49DBE1D /* Pods-NuggetRNExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NuggetRNExample.debug.xcconfig"; path = "Target Support Files/Pods-NuggetRNExample/Pods-NuggetRNExample.debug.xcconfig"; sourceTree = "<group>"; };
 		542A88A82C75D9D3001F21B0 /* NuggetRNExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NuggetRNExample.entitlements; path = NuggetRNExample/NuggetRNExample.entitlements; sourceTree = "<group>"; };
-		5EDDFCB82EE202C8A7AE03ED /* Pods-NuggetRNExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NuggetRNExample.release.xcconfig"; path = "Target Support Files/Pods-NuggetRNExample/Pods-NuggetRNExample.release.xcconfig"; sourceTree = "<group>"; };
+		7BE86CE4BB9D8D142B60F9F9 /* Pods-NuggetRNExample-NuggetRNExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NuggetRNExample-NuggetRNExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-NuggetRNExample-NuggetRNExampleTests/Pods-NuggetRNExample-NuggetRNExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = NuggetRNExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		970D82C9951002A255CE8CD1 /* Pods_NuggetRNExample_NuggetRNExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NuggetRNExample_NuggetRNExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C252F6D62A56C5FB00FCB5FC /* NuggetRNExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NuggetRNExample-Bridging-Header.h"; sourceTree = "<group>"; };
-		E26E7BE2420E08D40C93E2DE /* Pods-NuggetRNExample-NuggetRNExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NuggetRNExample-NuggetRNExampleTests.release.xcconfig"; path = "Target Support Files/Pods-NuggetRNExample-NuggetRNExampleTests/Pods-NuggetRNExample-NuggetRNExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+		DBE993D6347A580574868F6B /* Pods-NuggetRNExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NuggetRNExample.release.xcconfig"; path = "Target Support Files/Pods-NuggetRNExample/Pods-NuggetRNExample.release.xcconfig"; sourceTree = "<group>"; };
+		E45D21793FD3C5AAA7D3DD66 /* Pods_NuggetRNExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NuggetRNExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -53,7 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A6DCC6828FD7323C3462C17 /* Pods_NuggetRNExample_NuggetRNExampleTests.framework in Frameworks */,
+				C31F4A725FC9FAB7EFA9121F /* Pods_NuggetRNExample_NuggetRNExampleTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,7 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5FEBD522995225BC3C364F15 /* Pods_NuggetRNExample.framework in Frameworks */,
+				DCE3553F81A26BAC0A9F3561 /* Pods_NuggetRNExample.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,8 +104,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				2C68798EB94471FC540438D7 /* Pods_NuggetRNExample.framework */,
-				970D82C9951002A255CE8CD1 /* Pods_NuggetRNExample_NuggetRNExampleTests.framework */,
+				E45D21793FD3C5AAA7D3DD66 /* Pods_NuggetRNExample.framework */,
+				1037AEA64E6EAF601E5363B3 /* Pods_NuggetRNExample_NuggetRNExampleTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -144,10 +144,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				497AB800C2B7EF1557F06B24 /* Pods-NuggetRNExample.debug.xcconfig */,
-				5EDDFCB82EE202C8A7AE03ED /* Pods-NuggetRNExample.release.xcconfig */,
-				1D5B26BA7EA069B84D234C81 /* Pods-NuggetRNExample-NuggetRNExampleTests.debug.xcconfig */,
-				E26E7BE2420E08D40C93E2DE /* Pods-NuggetRNExample-NuggetRNExampleTests.release.xcconfig */,
+				4B36EFCA79E24BDFF49DBE1D /* Pods-NuggetRNExample.debug.xcconfig */,
+				DBE993D6347A580574868F6B /* Pods-NuggetRNExample.release.xcconfig */,
+				7BE86CE4BB9D8D142B60F9F9 /* Pods-NuggetRNExample-NuggetRNExampleTests.debug.xcconfig */,
+				17558D6A04D1B3246218CBA1 /* Pods-NuggetRNExample-NuggetRNExampleTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -159,11 +159,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "NuggetRNExampleTests" */;
 			buildPhases = (
-				352AFCC9DA03F98D144AAFB2 /* [CP] Check Pods Manifest.lock */,
+				3E820A84FDE485E44DAEE2C3 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				ECDB1CB5F8AF53CFD9705BCC /* [CP] Embed Pods Frameworks */,
+				ADCC706DBDBCF9DC44D3B173 /* [CP] Embed Pods Frameworks */,
+				91EB6F85C9B0D4FB07BA012E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -179,13 +180,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "NuggetRNExample" */;
 			buildPhases = (
-				FF4D2004F583CB907CD0D54C /* [CP] Check Pods Manifest.lock */,
+				39A736CBA790A13659D6B92B /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				0DF4454241AC76972A39CB79 /* [CP] Embed Pods Frameworks */,
+				E76CA28312DEB3975DD205F4 /* [CP] Embed Pods Frameworks */,
+				EE2F6BB7F308EF95622342DA /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -268,24 +270,29 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		0DF4454241AC76972A39CB79 /* [CP] Embed Pods Frameworks */ = {
+		39A736CBA790A13659D6B92B /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NuggetRNExample/Pods-NuggetRNExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Embed Pods Frameworks";
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NuggetRNExample/Pods-NuggetRNExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-NuggetRNExample-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NuggetRNExample/Pods-NuggetRNExample-frameworks.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		352AFCC9DA03F98D144AAFB2 /* [CP] Check Pods Manifest.lock */ = {
+		3E820A84FDE485E44DAEE2C3 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -307,7 +314,24 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		ECDB1CB5F8AF53CFD9705BCC /* [CP] Embed Pods Frameworks */ = {
+		91EB6F85C9B0D4FB07BA012E /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NuggetRNExample-NuggetRNExampleTests/Pods-NuggetRNExample-NuggetRNExampleTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NuggetRNExample-NuggetRNExampleTests/Pods-NuggetRNExample-NuggetRNExampleTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NuggetRNExample-NuggetRNExampleTests/Pods-NuggetRNExample-NuggetRNExampleTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		ADCC706DBDBCF9DC44D3B173 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -322,6 +346,40 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NuggetRNExample-NuggetRNExampleTests/Pods-NuggetRNExample-NuggetRNExampleTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E76CA28312DEB3975DD205F4 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NuggetRNExample/Pods-NuggetRNExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NuggetRNExample/Pods-NuggetRNExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NuggetRNExample/Pods-NuggetRNExample-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		EE2F6BB7F308EF95622342DA /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NuggetRNExample/Pods-NuggetRNExample-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NuggetRNExample/Pods-NuggetRNExample-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NuggetRNExample/Pods-NuggetRNExample-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -341,28 +399,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "export RCT_METRO_PORT=\"${RCT_METRO_PORT:=8081}\"\necho \"export RCT_METRO_PORT=${RCT_METRO_PORT}\" > \"${SRCROOT}/../node_modules/react-native/scripts/.packager.env\"\nif [ -z \"${RCT_NO_LAUNCH_PACKAGER+xxx}\" ] ; then\n  if nc -w 5 -z localhost ${RCT_METRO_PORT} ; then\n    if ! curl -s \"http://localhost:${RCT_METRO_PORT}/status\" | grep -q \"packager-status:running\" ; then\n      echo \"Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly\"\n      exit 2\n    fi\n  else\n    open \"$SRCROOT/../node_modules/react-native/scripts/launchPackager.command\" || echo \"Can't start packager automatically\"\n  fi\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		FF4D2004F583CB907CD0D54C /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-NuggetRNExample-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -398,7 +434,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1D5B26BA7EA069B84D234C81 /* Pods-NuggetRNExample-NuggetRNExampleTests.debug.xcconfig */;
+			baseConfigurationReference = 7BE86CE4BB9D8D142B60F9F9 /* Pods-NuggetRNExample-NuggetRNExampleTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEFINES_MODULE = YES;
@@ -425,7 +461,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E26E7BE2420E08D40C93E2DE /* Pods-NuggetRNExample-NuggetRNExampleTests.release.xcconfig */;
+			baseConfigurationReference = 17558D6A04D1B3246218CBA1 /* Pods-NuggetRNExample-NuggetRNExampleTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -449,7 +485,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 497AB800C2B7EF1557F06B24 /* Pods-NuggetRNExample.debug.xcconfig */;
+			baseConfigurationReference = 4B36EFCA79E24BDFF49DBE1D /* Pods-NuggetRNExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -480,7 +516,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5EDDFCB82EE202C8A7AE03ED /* Pods-NuggetRNExample.release.xcconfig */;
+			baseConfigurationReference = DBE993D6347A580574868F6B /* Pods-NuggetRNExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -513,7 +549,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CC = "";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -542,7 +578,7 @@
 				CXX = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -607,7 +643,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CC = "";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -636,7 +672,7 @@
 				CXX = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
