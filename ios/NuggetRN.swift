@@ -214,13 +214,13 @@ private struct ClientNuggetSDkConfiguration: NuggetSDkConfigurationDelegate {
     self.configuration = configuration
   }
   
-  private func createSDKConfigObjectFromDictionary( dictionary: [String: Any]?) -> NuggetJumborConfiguration {
+  private func createSDKConfigObjectFromDictionary( dictionary: [String: Any]?) -> NuggetJumboConfiguration {
     let nameSpace = dictionary?["nameSpace"] as? String ?? ""
     let jumboUrl = dictionary?["jumboUrl"] as? String
-    return NuggetJumborConfiguration(nameSpace: nameSpace, jumboUrl: jumboUrl)
+    return NuggetJumboConfiguration(nameSpace: nameSpace, jumboUrl: jumboUrl)
   }
   
-  func jumboConfiguration(completion: @escaping (NuggetJumborConfiguration) -> Void) {
+  func jumboConfiguration(completion: @escaping (NuggetJumboConfiguration) -> Void) {
     let configObject = self.createSDKConfigObjectFromDictionary(dictionary: configuration)
     completion(configObject)
   }
