@@ -1,7 +1,6 @@
-
 import React, { createContext, useContext, useMemo } from 'react';
-import { NuggetSDK } from 'nugget-sdk';
-import type { NuggetAuthProvider, NuggetAuthUserInfo, NuggetChatBusinessContext, NuggetJumborConfiguration } from 'nugget-sdk';
+import { NuggetSDK } from 'nugget-rn';
+import type { NuggetAuthProvider, NuggetAuthUserInfo, NuggetChatBusinessContext, NuggetJumborConfiguration , AccentColorData , FontData } from 'nugget-rn';
 
 // Define the context shape
 interface NuggetSDKContextType {
@@ -18,17 +17,23 @@ class NuggetAuthProviderImpl implements NuggetAuthProvider {
 
     constructor(initialToken: string = '') {
         this.accessToken = initialToken;
+        console.log('This.accesstoken ' + this.accessToken)
     }
 
     async getAuthInfo(): Promise<NuggetAuthUserInfo> {
+      // call your access token API here, set this.accessToken = received token anf return token as well as http code
+      console.log('Returning access token from getAuthInfo: ' + this.accessToken)
         return {
-            accessToken: this.accessToken
+            accessToken: this.accessToken,
+            httpCode : 200 // return the actual http code received after calling API
         };
     }
 
     async refreshAuthInfo(): Promise<NuggetAuthUserInfo> {
+      // call your refresh token API here , set this.accessToken = received token and return token as well as http code
         return {
-            accessToken: this.accessToken
+            accessToken: this.accessToken,
+            httpCode : 200 // return the actual http code received after calling API
         };
     }
 }
@@ -39,9 +44,9 @@ interface NuggetSDKProviderProps {
     initialAuthToken?: string;
 }
 
-export const NuggetSDKProvider: React.FC<NuggetSDKProviderProps> = ({ 
-    children, 
-    nameSpace, 
+export const NuggetSDKProvider: React.FC<NuggetSDKProviderProps> = ({
+    children,
+    nameSpace,
     initialAuthToken = 'accessToken-goes-here'
 }) => {
     const sdk = useMemo(() => {
@@ -58,15 +63,19 @@ export const NuggetSDKProvider: React.FC<NuggetSDKProviderProps> = ({
                 'botProperty2': ['value7', 'value8']
             }
         };
-
-        NuggetSDK.updateNotificationToken('some-token-goes-here');
-        NuggetSDK.updateNotificationPermissionStatus(true);
-
-        const nuggetSDKInstance = NuggetSDK.getInstance(sdkConfig, chatSupportBusinessContext);
-        const authDelegate = new NuggetAuthProviderImpl(initialAuthToken);
+       const accentColorData : AccentColorData = {
+          hex : '#FFF000'
+       }
+        const fontData : FontData = {
+             fontMapping : {
+                 'regular' : 'pixarRegular'
+             }
+         }
+        const nuggetSDKInstance = NuggetSDK.getInstance(sdkConfig, chatSupportBusinessContext , false , accentColorData , fontData);
+        const authDelegate = new NuggetAuthProviderImpl('your token here');
         nuggetSDKInstance.setAuthDelegate(authDelegate);
         return nuggetSDKInstance;
-    }, [nameSpace, initialAuthToken]); 
+    }, [nameSpace, initialAuthToken]);
 
     const contextValue = useMemo(() => ({
         sdk,
@@ -86,4 +95,4 @@ export const useNuggetSDK = () => {
         throw new Error('useNuggetSDK must be used within a NuggetSDKProvider');
     }
     return context;
-}; 
+};
