@@ -133,30 +133,29 @@ android {
             keyPassword 'android'
         }
 
-        release {
-          storeFile file(localProperties.getProperty("storePath"))
-          storePassword localProperties.getProperty("storePassword")
-          keyAlias localProperties.getProperty("keyAlias")
-          keyPassword localProperties.getProperty("keyPassword")
-        }
+//        release {
+//          storeFile file(localProperties.getProperty("storePath"))
+//          storePassword localProperties.getProperty("storePassword")
+//          keyAlias localProperties.getProperty("keyAlias")
+//          keyPassword localProperties.getProperty("keyPassword")
+//        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
-        release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            debuggable true
-            signingConfig signingConfigs.release
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-        }
+//        release {
+//            // Caution! In production, you need to generate your own keystore file.
+//            // see https://reactnative.dev/docs/signed-apk-android.
+//            debuggable true
+//            signingConfig signingConfigs.release
+//            minifyEnabled enableProguardInReleaseBuilds
+//            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+//        }
     }
 }
 
 dependencies {
-    // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("com.facebook.react:flipper-integration")
 
@@ -165,10 +164,6 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-
-    //region secure sdk
-    implementation 'io.github.nugget-tech:nugget-secure-sdk:0.1.5'
-    //endregion
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

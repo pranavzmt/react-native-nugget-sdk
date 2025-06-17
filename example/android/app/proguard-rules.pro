@@ -9,6 +9,3 @@
 
 # Add any project specific keep options here:
 -keep class com.nugget.secure.** { *; }
-
-// If you are using React Native < 0.60 then you uncomment this line:
-// -keep class com.facebook.react.bridge.JavaScriptExecutor { *; }
