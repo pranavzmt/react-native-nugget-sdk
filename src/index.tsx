@@ -19,7 +19,8 @@ const NuggetPlugin = NativeModules.NuggetRN
 
 // Auth Provider Interface
 export interface NuggetAuthUserInfo {
-    accessToken: string;
+    accessToken: string,
+    httpCode : Int
 }
 
 export interface NuggetAuthProvider {
@@ -54,6 +55,22 @@ export interface NuggetChatBusinessContext {
     botProperties?: { [key: string]: string[] };
 }
 
+export interface AccentColorData {
+   type?: string;
+   tint? : string;
+   hex? : string;
+}
+
+export interface FontData {
+  fontMapping: Map<string, string>;
+}
+
+interface DeeplinkResult {
+  success: boolean;
+  deeplink: string;
+  error?: string;
+}
+
 export class NuggetSDK {
     private static instance: NuggetSDK | null = null;
     static #pendingNotificationToken: string | null = null;
@@ -63,15 +80,9 @@ export class NuggetSDK {
     private eventEmitter: NativeEventEmitter;
     private eventSubscription: any;
 
-    /**
-     * Constructor for the NuggetSDK class
-     * @param config - The configuration for the NuggetSDK
-     * @param chatSupportBusinessContext - The chat support business context
-     */
-    private constructor(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext) {
+    private constructor(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext, handleDeeplinkInsideApp? : boolean , accentColorData? : AccentColorData , fontData? : FontData) {
         this.config = config;
         this.eventEmitter = new NativeEventEmitter(NuggetPlugin);
-
         this.eventSubscription = this.eventEmitter.addListener(
             'OnNativeRequest',
             async (event: NativeRequestEvent) => {
@@ -81,13 +92,16 @@ export class NuggetSDK {
 
                     switch (method) {
                         case 'requiresAuthInfo':
-                            result = { success: await this.getAuthInfo() };
+                            result = await this.getAuthInfo();
                             break;
                         case 'requestRefreshAuthInfo':
-                            result = { success: await this.refreshAuthInfo() };
+                            result = await this.refreshAuthInfo();
                             break;
                         case 'getJumboConfig':
                             result = this.getConfiguration();
+                            break;
+                        case 'triggerDeeplinkInApp':
+                            result = this.triggerDeeplink(payload?.deeplink ?? '');
                             break;
                         default:
                             console.warn(`Unknown method received: ${method}`);
@@ -103,8 +117,16 @@ export class NuggetSDK {
                 }
             }
         );
-        NuggetPlugin.initializeNuggetFactory(config, chatSupportBusinessContext);
+        NuggetPlugin.initializeNuggetFactory(config, chatSupportBusinessContext , handleDeeplinkInsideApp , accentColorData , fontData);
     }
+
+  private triggerDeeplink(deeplink: string) : DeeplinkResult {
+      // Handle your deeplink here
+      return {
+        success: true,
+        deeplink,
+      };
+  }
 
     private async getAuthInfo(): Promise<{ [key: string]: any }> {
         if (!this.authDelegate) {
@@ -126,16 +148,10 @@ export class NuggetSDK {
         return { ...this.config };
     }
 
-    /**
-     * Gets the instance of the NuggetSDK class
-     * @param config - The configuration for the NuggetSDK
-     * @param chatSupportBusinessContext - The chat support business context
-     * @returns The instance of the NuggetSDK class
-     */
-    public static getInstance(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext): NuggetSDK {
+    public static getInstance(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext, handleDeeplinkInsideApp? : boolean , accentColorData? : AccentColorData , fontData? : FontData): NuggetSDK {
 
         if (!NuggetSDK.instance) {
-            NuggetSDK.instance = new NuggetSDK(config, chatSupportBusinessContext);
+            NuggetSDK.instance = new NuggetSDK(config, chatSupportBusinessContext , handleDeeplinkInsideApp , accentColorData , fontData);
         }
         // If called again with a new config, the existing instance's config is not updated.
         // This is typical for basic singletons: initialize once.
@@ -177,58 +193,30 @@ export class NuggetSDK {
      * @returns Promise resolving to true if SDK opened successfully
      * @throws Error if the deeplink is invalid
      */
-    public async openNuggetSDK(deeplink: string): Promise<boolean> {
 
-        if (!deeplink || typeof deeplink !== 'string') {
-            throw new Error('Invalid deeplink parameter: deeplink must be a non-empty string');
-        }
+   public openNuggetSDK(deeplink: string): Promise<boolean> {
+     if (!NuggetSDK.instance) {
+       return Promise.reject(new Error('NuggetSDK not initialized. Please initialize NuggetSDK first.'));
+     }
 
-        return new Promise((resolve) => {
-            try {
-                NuggetPlugin.openNuggetSDK(deeplink, (result: any) => {
-                    let isOpenedSuccessfully = !!result?.nuggetSDKResult;
-                    if (isOpenedSuccessfully) {
-                        if (NuggetSDK.#pendingNotificationToken !== null) {
-                            NuggetPlugin.updateNotificationToken(NuggetSDK.#pendingNotificationToken);
-                            NuggetSDK.#pendingNotificationToken = null;
-                        }
-                        if (NuggetSDK.#pendingNotificationPermissionStatus !== null) {
-                            NuggetPlugin.updateNotificationPermissionStatus(NuggetSDK.#pendingNotificationPermissionStatus);
-                            NuggetSDK.#pendingNotificationPermissionStatus = null;
-                        }
-                    }
-                    resolve(isOpenedSuccessfully);
-                });
-            } catch (error) {
-                console.error('Error opening Nugget SDK:', error);
-                resolve(false);
-            }
-        });
-    }
+     if (!deeplink || typeof deeplink !== 'string') {
+       return Promise.reject(new Error('Invalid deeplink parameter: deeplink must be a non-empty string'));
+     }
 
-    // change them to static methods
-    /**
-     * Updates the notification token
-     * @param token - The notification token
-     */
-    public static updateNotificationToken(token: string) {
-        if (NuggetSDK.instance) {
-            NuggetPlugin.updateNotificationToken(token);
-        } else {
-            NuggetSDK.#pendingNotificationToken = token;
-        }
-    }
-
-    /**
-     * Updates the notification permission status
-     * @param notificationAllowed - The notification permission status
-     */
-    public static updateNotificationPermissionStatus(notificationAllowed: boolean) {
-        if (NuggetSDK.instance) {
-            NuggetPlugin.updateNotificationPermissionStatus(notificationAllowed);
-        } else {
-            NuggetSDK.#pendingNotificationPermissionStatus = notificationAllowed;
-        }
-    }
+     return NuggetPlugin.openNuggetSDK("epifi://unified-support/builder?flowType=ticketing&omniTicketingFlow=true")
+       .then((result: boolean) => {
+         if (result) {
+           console.log('SDK opened successfully');
+           return true;
+         } else {
+           console.log('Failed to open SDK');
+           return false;
+         }
+       })
+       .catch((error: any) => {
+         console.error('Error opening SDK:', error);
+         return false;
+       });
+   }
 
 }
