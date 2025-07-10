@@ -20,7 +20,7 @@ const NuggetPlugin = NativeModules.NuggetRN
 // Auth Provider Interface
 export interface NuggetAuthUserInfo {
     accessToken: string,
-    httpCode : Int
+    httpCode : number
 }
 
 export interface NuggetAuthProvider {
@@ -92,6 +92,11 @@ export class NuggetSDK {
 
                     switch (method) {
                         case 'requiresAuthInfo':
+                            console.log('Received requiresAuthInfo request');
+                            if (!this.authDelegate) {
+                                console.warn('Auth delegate not set. Returning empty auth info.');
+                                result = { error: 'Auth delegate not set' };
+                            }
                             result = await this.getAuthInfo();
                             break;
                         case 'requestRefreshAuthInfo':
@@ -129,9 +134,12 @@ export class NuggetSDK {
   }
 
     private async getAuthInfo(): Promise<{ [key: string]: any }> {
+        
         if (!this.authDelegate) {
             throw new Error('Auth delegate not set. Please call setAuthDelegate first.');
         }
+
+        console.log('Fetching auth info from delegate...');
         const authInfoFromDelegate: NuggetAuthUserInfo = await this.authDelegate.getAuthInfo();
         return { ...authInfoFromDelegate };
     }
@@ -203,20 +211,17 @@ export class NuggetSDK {
        return Promise.reject(new Error('Invalid deeplink parameter: deeplink must be a non-empty string'));
      }
 
-     return NuggetPlugin.openNuggetSDK("epifi://unified-support/builder?flowType=ticketing&omniTicketingFlow=true")
-       .then((result: boolean) => {
-         if (result) {
+     return new Promise((resolve, reject) => {
+       NuggetPlugin.openNuggetSDK(deeplink, (result: DeeplinkResult) => {
+         if (result.success) {
            console.log('SDK opened successfully');
-           return true;
+           resolve(true);
          } else {
-           console.log('Failed to open SDK');
-           return false;
+           console.error('Failed to open SDK:', result.error);
+           reject(new Error(result.error || 'Failed to open SDK'));
          }
-       })
-       .catch((error: any) => {
-         console.error('Error opening SDK:', error);
-         return false;
        });
+     });
    }
 
 }

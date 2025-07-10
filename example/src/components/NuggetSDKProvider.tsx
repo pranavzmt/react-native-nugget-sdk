@@ -52,24 +52,24 @@ export const NuggetSDKProvider: React.FC<NuggetSDKProviderProps> = ({
     const sdk = useMemo(() => {
         const sdkConfig: NuggetJumborConfiguration = { nameSpace };
         const chatSupportBusinessContext: NuggetChatBusinessContext = {
-            channelHandle: 'channelHandle',
-            ticketGroupingId: 'ticketGroupingId-goes-here',
-            ticketProperties: {
-                'ticketProperty1': ['value1', 'value2'],
-                'ticketProperty2': ['value3', 'value4']
-            },
-            botProperties: {
-                'botProperty1': ['value5', 'value6'],
-                'botProperty2': ['value7', 'value8']
-            }
+            // channelHandle: 'channelHandle',
+            // ticketGroupingId: 'ticketGroupingId-goes-here',
+            // ticketProperties: {
+            //     'ticketProperty1': ['value1', 'value2'],
+            //     'ticketProperty2': ['value3', 'value4']
+            // },
+            // botProperties: {
+            //     'botProperty1': ['value5', 'value6'],
+            //     'botProperty2': ['value7', 'value8']
+            // }
         };
        const accentColorData : AccentColorData = {
           hex : '#FFF000'
        }
         const fontData : FontData = {
-             fontMapping : {
-                 'regular' : 'pixarRegular'
-             }
+             fontMapping : new Map<string, string>([
+                 ['regular' , 'pixarRegular']
+             ])
          }
         const nuggetSDKInstance = NuggetSDK.getInstance(sdkConfig, chatSupportBusinessContext , false , accentColorData , fontData);
         const authDelegate = new NuggetAuthProviderImpl('your token here');

@@ -3,6 +3,8 @@ import NuggetSDK
 import React
 
 struct ClientSideNuggetChatBusinessContext: NuggetChatBusinessContext {
+  var type: String?
+  var ticketID: Int?
   var channelHandle: String?
   var ticketGroupingId: String?
   var ticketProperties: [String : [String]]?
@@ -38,7 +40,7 @@ class ClientSideNuggetChatBusinessContextDelegate: NuggetBusinessContextProvider
                                                botProperties: botProperties)
   }
   
-  func chatSupportBusingessContext() -> NuggetChatBusinessContext {
+  func chatSupportBusinessContext() -> NuggetChatBusinessContext {
     return createChatSupportBusinessContextFromDictionary()
   }
 }
@@ -61,6 +63,7 @@ class NuggetRN: RCTEventEmitter {
   
   // Required override for RCTEventEmitter
   override init() {
+    
     super.init()
   }
   
@@ -71,18 +74,22 @@ class NuggetRN: RCTEventEmitter {
   }
   
   var clientSideNuggetChatBusinessContextDelegate :ClientSideNuggetChatBusinessContextDelegate?
-  var clientNuggetSDkConfiguration :NuggetSDkConfigurationDelegate = ClientNuggetSDkConfiguration(configuration: [:])
+  var clientNuggetSDKConfiguration :NuggetSDKConfigurationDelegate = ClientNuggetSDKConfiguration()
   var nuggetPushNotificationsListener: NuggetPushNotificationsListener = NuggetPushNotificationsListener()
   
   @objc
-  func initializeNuggetFactory(_ sdkConfiguration: [String: Any], chatSupportBusinessContext: [String: Any]) {
-    clientNuggetSDkConfiguration = ClientNuggetSDkConfiguration(configuration: sdkConfiguration)
+  func initializeNuggetFactory(_ sdkConfiguration: [String: Any],
+                               chatSupportBusinessContext: [String: Any],
+                               handleDeeplinkInsideApp: NSNumber?,
+                               accentColorData: [String: Any]?,
+                               fontData: [String: Any]?) {
+    clientNuggetSDKConfiguration = ClientNuggetSDKConfiguration(configuration: sdkConfiguration, handleDeeplinkInsideApp: handleDeeplinkInsideApp, accentColorData: accentColorData, fontData: fontData)
     clientSideNuggetChatBusinessContextDelegate = ClientSideNuggetChatBusinessContextDelegate(params: chatSupportBusinessContext)
     nuggetFactory = NuggetSDK.initializeNuggetFactory(
       authDelegate: self,
       notificationDelegate: nuggetPushNotificationsListener,
-      sdkConfigurationDelegate: clientNuggetSDkConfiguration,
-      chatBusinessContextDelegate: nil)
+      sdkConfigurationDelegate: clientNuggetSDKConfiguration,
+      chatBusinessContextDelegate: clientSideNuggetChatBusinessContextDelegate)
   }
   
   @objc
@@ -172,8 +179,7 @@ extension NuggetRN: NuggetAuthProviderDelegate {
   func authManager(requiresAuthInfo completion: @escaping ((NuggetAuthUserInfo)?, (Error)?) -> Void) {
     requestValueFromJS(method: "requiresAuthInfo", payload: [:]) { result in
       guard let passesValue = result as? [String: Any],
-            let authInfo = passesValue["success"] as? [String: Any],
-            let authInfo = self.createAuthObjectFromDictionary(dictionary: authInfo) else {
+            let authInfo = self.createAuthObjectFromDictionary(dictionary: passesValue) else {
         completion(nil, NSError(domain: "NuggetRN", code: 0, userInfo: nil))
         return
       }
@@ -184,8 +190,7 @@ extension NuggetRN: NuggetAuthProviderDelegate {
   func authManager(requestRefreshAuthInfo completion: @escaping ((any NuggetAuthUserInfo)?, (any Error)?) -> Void) {
     requestValueFromJS(method: "requestRefreshAuthInfo", payload: [:]) { result in
       guard let passesValue = result as? [String: Any],
-            let authInfo = passesValue["success"] as? [String: Any],
-            let authInfo = self.createAuthObjectFromDictionary(dictionary: authInfo) else {
+            let authInfo = self.createAuthObjectFromDictionary(dictionary: passesValue) else {
         completion(nil, NSError(domain: "NuggetRN", code: 0, userInfo: nil))
         return
       }
@@ -207,21 +212,46 @@ extension NuggetRN: NuggetAuthProviderDelegate {
 }
 
 // MARK: SDK config requirements
-private struct ClientNuggetSDkConfiguration: NuggetSDkConfigurationDelegate {
-  
-  private let configuration: [String: Any]?
-  init(configuration: [String: Any]) {
-    self.configuration = configuration
+private struct ClientNuggetSDKConfiguration: NuggetSDKConfigurationDelegate {
+  func chatScreenClosedCallback() {
+    print("chat screen closed")
   }
   
-  private func createSDKConfigObjectFromDictionary( dictionary: [String: Any]?) -> NuggetJumborConfiguration {
+  init() { }
+  
+  private var configuration: [String: Any]?
+  private var handleDeeplinkInsideApp: NSNumber?
+  private var accentColorData: [String: Any]?
+  private var fontData: [String: Any]?
+
+  init(configuration: [String: Any], handleDeeplinkInsideApp: NSNumber?, accentColorData: [String: Any]?, fontData: [String: Any]?) {
+    self.configuration = configuration
+    self.handleDeeplinkInsideApp = handleDeeplinkInsideApp
+    self.accentColorData = accentColorData
+    self.fontData = fontData
+  }
+  
+  private func createSDKConfigObjectFromDictionary( dictionary: [String: Any]?) -> NuggetJumboConfiguration {
     let nameSpace = dictionary?["nameSpace"] as? String ?? ""
     let jumboUrl = dictionary?["jumboUrl"] as? String
-    return NuggetJumborConfiguration(nameSpace: nameSpace, jumboUrl: jumboUrl)
+    return NuggetJumboConfiguration(nameSpace: nameSpace, jumboUrl: jumboUrl)
   }
   
-  func jumboConfiguration(completion: @escaping (NuggetJumborConfiguration) -> Void) {
+  func jumboConfiguration(completion: @escaping (NuggetJumboConfiguration) -> Void) {
     let configObject = self.createSDKConfigObjectFromDictionary(dictionary: configuration)
     completion(configObject)
   }
+
+  func getHandleDeeplinkInsideApp() -> Bool? {
+      return handleDeeplinkInsideApp?.boolValue
+  }
+
+  func getAccentColorData() -> [String: Any]? {
+      return accentColorData
+  }
+
+  func getFontData() -> [String: Any]? {
+      return fontData
+  }
+
 }

@@ -19,13 +19,12 @@ prepare_react_native_project!
 # flipper_config = ENV['NO_FLIPPER'] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
 
 flipper_config = FlipperConfiguration.disabled
-use_frameworks! :linkage => :static
+use_frameworks!
 
 target 'NuggetRNExample' do
   config = use_native_modules!
 
-  pod 'NuggetSDK', :git => 'https://github.com/BudhirajaRajesh/NuggetSDK.git', :tag => '0.1.3'
-  # pod 'NuggetSDK', :path => '/Users/singh.pranav@zomato.com/Desktop/REACT-NATIVE/LocalNuggetSDK/nugget-sdk-ios'
+  pod 'NuggetSDK', :git => 'https://github.com/pranavzmt/nugget-sdk-ios.git', :tag => '99.0.4'
   use_react_native!(
     :path => config[:reactNativePath],
     # Enables Flipper.
