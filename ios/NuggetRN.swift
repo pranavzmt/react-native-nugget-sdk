@@ -111,7 +111,8 @@ class NuggetRN: RCTEventEmitter {
       
       if let rootViewController, let viewController {
         viewController.modalPresentationStyle = .fullScreen
-        rootViewController.present(viewController, animated: true)
+        let chatNavigationController = UINavigationController(rootViewController: viewController)
+        rootViewController.present(chatNavigationController, animated: true)
         callback([["nuggetSDKResult": true]])
         return
       }
@@ -119,7 +120,8 @@ class NuggetRN: RCTEventEmitter {
       let windowSceneVC = self.getRootViewControllerFromWindowScene()
       if let windowSceneVC, let viewController {
         viewController.modalPresentationStyle = .fullScreen
-        windowSceneVC.present(viewController, animated: true)
+        let chatNavigationController = UINavigationController(rootViewController: viewController)
+        windowSceneVC.present(chatNavigationController, animated: true)
         callback([["nuggetSDKResult": true]])
         return
       }
