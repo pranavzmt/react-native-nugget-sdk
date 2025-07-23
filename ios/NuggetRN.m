@@ -5,9 +5,9 @@
 
 @interface RCT_EXTERN_MODULE(NuggetRN, RCTEventEmitter)
 
-RCT_EXTERN_METHOD(canOpenDeeplink:(NSString *)deeplink callback:(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(canOpenDeeplink:(NSString *)deeplink resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(openNuggetSDK:(NSString *)deeplink callback:(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(openNuggetSDK:(NSString *)deeplink resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(initializeNuggetFactory:(NSDictionary *)sdkConfiguration chatSupportBusinessContext:(NSDictionary *)chatSupportBusinessContext handleDeeplinkInsideApp:(nonnull NSNumber *)handleDeeplinkInsideApp accentColorData:(NSDictionary *)accentColorData fontData:(NSDictionary *)fontData)
 

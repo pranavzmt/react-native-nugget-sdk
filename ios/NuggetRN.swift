@@ -68,9 +68,10 @@ class NuggetRN: RCTEventEmitter {
   }
   
   @objc
-  func canOpenDeeplink(_ deeplink: String, callback: @escaping RCTResponseSenderBlock) {
+  func canOpenDeeplink(_ deeplink: String,
+   resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     let canOpenDeeplink = NuggetFactory.canOpenDeeplink(deeplink: deeplink)
-    callback([["canOpenDeeplink": canOpenDeeplink]])
+    resolve(["canOpenDeeplink": canOpenDeeplink])
   }
   
   var clientSideNuggetChatBusinessContextDelegate :ClientSideNuggetChatBusinessContextDelegate?
@@ -104,29 +105,29 @@ class NuggetRN: RCTEventEmitter {
   }
   
   @objc
-  func openNuggetSDK(_ deeplink: String, callback: @escaping RCTResponseSenderBlock) {
+  func openNuggetSDK(_ deeplink: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.main.async {
-      let viewController = self.nuggetFactory?.contentViewController(deeplink: deeplink)
-      let rootViewController = UIApplication.shared.delegate?.window??.rootViewController
-      
-      if let rootViewController, let viewController {
-        viewController.modalPresentationStyle = .fullScreen
-        let chatNavigationController = UINavigationController(rootViewController: viewController)
-        rootViewController.present(chatNavigationController, animated: true)
-        callback([["nuggetSDKResult": true]])
-        return
-      }
-      
-      let windowSceneVC = self.getRootViewControllerFromWindowScene()
-      if let windowSceneVC, let viewController {
-        viewController.modalPresentationStyle = .fullScreen
-        let chatNavigationController = UINavigationController(rootViewController: viewController)
-        windowSceneVC.present(chatNavigationController, animated: true)
-        callback([["nuggetSDKResult": true]])
-        return
-      }
+        let viewController = self.nuggetFactory?.contentViewController(deeplink: deeplink)
+        let rootViewController = UIApplication.shared.delegate?.window??.rootViewController
+        if let rootViewController, let viewController {
+            viewController.modalPresentationStyle = .fullScreen
+            let chatNavigationController = UINavigationController(rootViewController: viewController)
+            rootViewController.present(chatNavigationController, animated: true)
+            resolve(["nuggetSDKResult": true])
+            return
+        }
+        let windowSceneVC = self.getRootViewControllerFromWindowScene()
+        if let windowSceneVC, let viewController {
+            viewController.modalPresentationStyle = .fullScreen
+            let chatNavigationController = UINavigationController(rootViewController: viewController)
+            windowSceneVC.present(chatNavigationController, animated: true)
+            resolve(["nuggetSDKResult": true])
+            return
+        }
+        // If we reach here, presentation failed
+        reject("NO_VIEW_CONTROLLER", "Could not present Nugget SDK view controller", nil)
     }
-  }
+}
   
   @MainActor @available(iOS 13.0, *)
   private func getRootViewControllerFromWindowScene() -> UIViewController? {
