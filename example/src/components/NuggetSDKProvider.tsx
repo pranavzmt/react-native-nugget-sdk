@@ -72,7 +72,7 @@ export const NuggetSDKProvider: React.FC<NuggetSDKProviderProps> = ({
              ])
          }
         const nuggetSDKInstance = NuggetSDK.getInstance(sdkConfig, chatSupportBusinessContext , false , accentColorData , fontData);
-        const authDelegate = new NuggetAuthProviderImpl('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBWZXJzaW9uIjoiIiwiYnVzaW5lc3NJZCI6MSwiY2xpZW50SWQiOjksImNsaWVudF9uYW1lIjoiZ29raXdpIiwiZGlzcGxheU5hbWUiOiJQcmFuYXYgc3Rhc2hmaW4gdGVzdCIsImVtYWlsIjoiIiwiZXhwIjoxNzUzNDI0Mjc0LCJob3N0TmFtZSI6Imdva2l3aS5udWdnZXQuY29tIiwiaWF0IjoxNzUzMzM3ODc0LCJsYW5ndWFnZSI6IiIsInBob25lTnVtYmVyIjoiNzg5NzU3MDY5NSIsInBob3RvVVJMIjoiIiwic291cmNlIjoiYW5kcm9pZCIsInRlbmFudElEIjoyMywidWlkIjoia3VuYWwtdGVzdCJ9.owMzAAbV9VS2GIxgOrN8os0F3PcyW_ur6EIkRMnor7M');
+        const authDelegate = new NuggetAuthProviderImpl('your-access-token-goes-here');
         nuggetSDKInstance.setAuthDelegate(authDelegate);
         return nuggetSDKInstance;
     }, [nameSpace, initialAuthToken]);
