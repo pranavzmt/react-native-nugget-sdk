@@ -1491,15 +1491,15 @@
     serve-static "^1.13.1"
     temp-dir "^2.0.0"
 
+"@react-native/gradle-plugin@0.73.2":
+  version "0.73.2"
+  resolved "https://registry.yarnpkg.com/@react-native/gradle-plugin/-/gradle-plugin-0.73.2.tgz#5f18fa894092ee765065050f019323a6a9cbcb76"
+  integrity sha512-n3xSfRoNn6cXlkdLa10uSpcKHZBgCfGcMdt6jeAmHGzNsgECtGBkR9l+BUYvVcQFHieNDZrSPNOhu6h81OhejQ==
+
 "@react-native/gradle-plugin@0.73.4":
   version "0.73.4"
   resolved "https://registry.yarnpkg.com/@react-native/gradle-plugin/-/gradle-plugin-0.73.4.tgz#aa55784a8c2b471aa89934db38c090d331baf23b"
   integrity sha512-PMDnbsZa+tD55Ug+W8CfqXiGoGneSSyrBZCMb5JfiB3AFST3Uj5e6lw8SgI/B6SKZF7lG0BhZ6YHZsRZ5MlXmg==
-
-"@react-native/gradle-plugin@^0.79.2":
-  version "0.79.2"
-  resolved "https://registry.yarnpkg.com/@react-native/gradle-plugin/-/gradle-plugin-0.79.2.tgz#d41d4e2c63baf688a2b47652c6260f2a2f1ec091"
-  integrity sha512-6MJFemrwR0bOT0QM+2BxX9k3/pvZQNmJ3Js5pF/6owsA0cUDiCO57otiEU8Fz+UywWEzn1FoQfOfQ8vt2GYmoA==
 
 "@react-native/js-polyfills@0.73.1":
   version "0.73.1"
@@ -3975,10 +3975,9 @@ npm-run-path@^4.0.1:
   version "1.0.6"
   dependencies:
     "@babel/runtime" "^7.27.4"
-    "@react-native/gradle-plugin" "^0.79.2"
+    "@react-native/gradle-plugin" "0.73.2"
     "@types/react-native-fs" "^2.8.3"
     react-native-fs "^2.20.0"
-    react-native-gradle-plugin "^0.71.19"
     ts-lint "^4.5.1"
 
 nullthrows@^1.1.1:
@@ -4411,11 +4410,6 @@ react-native-fs@*, react-native-fs@^2.20.0:
   dependencies:
     base-64 "^0.1.0"
     utf8 "^3.0.0"
-
-react-native-gradle-plugin@^0.71.19:
-  version "0.71.19"
-  resolved "https://registry.yarnpkg.com/react-native-gradle-plugin/-/react-native-gradle-plugin-0.71.19.tgz#3379e28341fcd189bc1f4691cefc84c1a4d7d232"
-  integrity sha512-1dVk9NwhoyKHCSxcrM6vY6cxmojeATsBobDicX0ZKr7DgUF2cBQRTKsimQFvzH8XhOVXyH8p4HyDSZNIFI8OlQ==
 
 react-native@0.73.2:
   version "0.73.2"

@@ -42,6 +42,11 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
 
   private val pendingResponses = ConcurrentHashMap<String, CompletableDeferred<ReadableMap>>()
 
+  private var channelHandle : String? = null
+  private var ticketGroupingId : String? = null
+  private var ticketProperties : HashMap<String , ArrayList<String>>? = null
+  private var botProperties : HashMap<String , ArrayList<String>>? = null
+
   companion object {
     const val NAME = "NuggetRN"
   }
@@ -67,10 +72,10 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
 
       val namespace = jumboConfiguration?.getString("nameSpace") ?: ""
 
-      val channelHandle = businessContext?.getString("channelHandle")
-      val ticketGroupingId = businessContext?.getString("ticketGroupingId")
-      val botProperties = resolveCustomProperties(key = "botProperties" , map = businessContext)
-      val ticketingProperties = resolveCustomProperties(key = "ticketProperties" , map = businessContext)
+      channelHandle = businessContext?.getString("channelHandle")
+      ticketGroupingId = businessContext?.getString("ticketGroupingId")
+      botProperties = resolveCustomProperties(key = "botProperties" , map = businessContext)
+      ticketProperties = resolveCustomProperties(key = "ticketProperties" , map = businessContext)
 
       val handleDeeplinkInsideTheApp = (handleDeeplinkInsideApp == true)
 
@@ -95,10 +100,10 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
 
           override fun getBusinessContext(payloadArgs : HashMap<String, String>?): BusinessContext {
             return BusinessContext(
-              channelHandle = "",
-              ticketGroupingId = "",
-              ticketProperties = hashMapOf(),
-              botProperties = hashMapOf()
+              channelHandle = channelHandle,
+              ticketGroupingId = ticketGroupingId,
+              ticketProperties = ticketProperties,
+              botProperties = botProperties
             )
           }
 

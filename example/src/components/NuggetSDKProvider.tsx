@@ -72,7 +72,7 @@ export const NuggetSDKProvider: React.FC<NuggetSDKProviderProps> = ({
              ])
          }
         const nuggetSDKInstance = NuggetSDK.getInstance(sdkConfig, chatSupportBusinessContext , false , accentColorData , fontData);
-        const authDelegate = new NuggetAuthProviderImpl('your token here');
+        const authDelegate = new NuggetAuthProviderImpl('your-access-token-goes-here');
         nuggetSDKInstance.setAuthDelegate(authDelegate);
         return nuggetSDKInstance;
     }, [nameSpace, initialAuthToken]);
