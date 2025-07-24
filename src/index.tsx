@@ -134,7 +134,7 @@ export class NuggetSDK {
   }
 
     private async getAuthInfo(): Promise<{ [key: string]: any }> {
-        
+
         if (!this.authDelegate) {
             throw new Error('Auth delegate not set. Please call setAuthDelegate first.');
         }
@@ -183,16 +183,13 @@ export class NuggetSDK {
             throw new Error('Invalid deeplink parameter: deeplink must be a non-empty string');
         }
 
-        return new Promise((resolve) => {
-            try {
-                NuggetPlugin.canOpenDeeplink(deeplink, (result: any) => {
-                    resolve(!!result?.canOpenDeeplink);
-                });
-            } catch (error) {
-                console.error('Error checking deeplink:', error);
-                resolve(false);
-            }
-        });
+           try {
+               const result = await NuggetPlugin.canOpenDeeplink(deeplink);
+               return !!result?.canOpenDeeplink;
+           } catch (error) {
+               console.error('Error checking deeplink:', error);
+               return false;
+           }
     }
 
     /**
@@ -202,26 +199,27 @@ export class NuggetSDK {
      * @throws Error if the deeplink is invalid
      */
 
-   public openNuggetSDK(deeplink: string): Promise<boolean> {
-     if (!NuggetSDK.instance) {
-       return Promise.reject(new Error('NuggetSDK not initialized. Please initialize NuggetSDK first.'));
-     }
-
-     if (!deeplink || typeof deeplink !== 'string') {
-       return Promise.reject(new Error('Invalid deeplink parameter: deeplink must be a non-empty string'));
-     }
-
-     return new Promise((resolve, reject) => {
-       NuggetPlugin.openNuggetSDK(deeplink, (result: DeeplinkResult) => {
-         if (result.success) {
-           console.log('SDK opened successfully');
-           resolve(true);
-         } else {
-           console.error('Failed to open SDK:', result.error);
-           reject(new Error(result.error || 'Failed to open SDK'));
-         }
-       });
-     });
-   }
+    public async openNuggetSDK(deeplink: string): Promise<boolean> {
+        if (!NuggetSDK.instance) {
+            return Promise.reject(new Error('NuggetSDK not initialized. Please initialize NuggetSDK first.'));
+        }
+        if (!deeplink || typeof deeplink !== 'string') {
+            return Promise.reject(new Error('Invalid deeplink parameter: deeplink must be a non-empty string'));
+        }
+        try {
+            const result = await NuggetPlugin.openNuggetSDK(deeplink);
+            if (result && (result.nuggetSDKResult === true || result.success === true)) {
+                console.log('SDK opened successfully');
+                return Promise.resolve(true);
+            } else {
+                const errorMsg = result?.error || 'Failed to open SDK';
+                console.error('Failed to open SDK:', errorMsg);
+                return Promise.reject(new Error(errorMsg));
+            }
+        } catch (error: any) {
+            console.error('Error opening SDK:', error);
+            return Promise.reject(new Error(error?.message || 'Failed to open SDK'));
+        }
+    }
 
 }

@@ -9,7 +9,7 @@ struct ClientSideNuggetChatBusinessContext: NuggetChatBusinessContext {
   var ticketGroupingId: String?
   var ticketProperties: [String : [String]]?
   var botProperties: [String : [String]]?
-  
+
   init(channelHandle: String? = nil,
        ticketGroupingId: String? = nil,
        ticketProperties: [String : [String]]? = nil,
@@ -22,12 +22,12 @@ struct ClientSideNuggetChatBusinessContext: NuggetChatBusinessContext {
 }
 
 class ClientSideNuggetChatBusinessContextDelegate: NuggetBusinessContextProviderDelegate {
-  
+
   private let params: [String: Any]?
   init(params: [String: Any]?) {
     self.params = params
   }
-  
+
   private func createChatSupportBusinessContextFromDictionary() -> NuggetChatBusinessContext {
     guard let params else { return ClientSideNuggetChatBusinessContext() }
     let channelHandle: String? = params["channelHandle"] as? String
@@ -39,7 +39,7 @@ class ClientSideNuggetChatBusinessContextDelegate: NuggetBusinessContextProvider
                                                ticketProperties: ticketProperties,
                                                botProperties: botProperties)
   }
-  
+
   func chatSupportBusinessContext() -> NuggetChatBusinessContext {
     return createChatSupportBusinessContextFromDictionary()
   }
@@ -50,33 +50,34 @@ class ClientSideNuggetChatBusinessContextDelegate: NuggetBusinessContextProvider
 class NuggetRN: RCTEventEmitter {
   var pendingCompletions: [String: (Any) -> Void] = [:]
   var nuggetFactory: NuggetFactory?
-  
+
   // Required for RCTEventEmitter
   override static func requiresMainQueueSetup() -> Bool {
     return false
   }
-  
+
   // Required override for RCTEventEmitter
   override func supportedEvents() -> [String]! {
     return ["OnNativeRequest"]
   }
-  
+
   // Required override for RCTEventEmitter
   override init() {
-    
+
     super.init()
   }
-  
+
   @objc
-  func canOpenDeeplink(_ deeplink: String, callback: @escaping RCTResponseSenderBlock) {
+  func canOpenDeeplink(_ deeplink: String,
+   resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     let canOpenDeeplink = NuggetFactory.canOpenDeeplink(deeplink: deeplink)
-    callback([["canOpenDeeplink": canOpenDeeplink]])
+    resolve(["canOpenDeeplink": canOpenDeeplink])
   }
-  
+
   var clientSideNuggetChatBusinessContextDelegate :ClientSideNuggetChatBusinessContextDelegate?
   var clientNuggetSDKConfiguration :NuggetSDKConfigurationDelegate = ClientNuggetSDKConfiguration()
   var nuggetPushNotificationsListener: NuggetPushNotificationsListener = NuggetPushNotificationsListener()
-  
+
   @objc
   func initializeNuggetFactory(_ sdkConfiguration: [String: Any],
                                chatSupportBusinessContext: [String: Any],
@@ -91,43 +92,43 @@ class NuggetRN: RCTEventEmitter {
       sdkConfigurationDelegate: clientNuggetSDKConfiguration,
       chatBusinessContextDelegate: clientSideNuggetChatBusinessContextDelegate)
   }
-  
+
   @objc
   func updateNotificationToken(_ token: String) {
     nuggetPushNotificationsListener.tokenUpdated(to: token)
   }
-  
+
   @objc
   func updateNotificationPermissionStatus(_ notificationAllowed: Bool) {
     let notificationPermissionStatus: UNAuthorizationStatus = notificationAllowed ? .authorized : .denied
     nuggetPushNotificationsListener.permissionStatusUpdated(to: notificationPermissionStatus)
   }
-  
+
   @objc
-  func openNuggetSDK(_ deeplink: String, callback: @escaping RCTResponseSenderBlock) {
+  func openNuggetSDK(_ deeplink: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.main.async {
-      let viewController = self.nuggetFactory?.contentViewController(deeplink: deeplink)
-      let rootViewController = UIApplication.shared.delegate?.window??.rootViewController
-      
-      if let rootViewController, let viewController {
-        viewController.modalPresentationStyle = .fullScreen
-        let chatNavigationController = UINavigationController(rootViewController: viewController)
-        rootViewController.present(chatNavigationController, animated: true)
-        callback([["nuggetSDKResult": true]])
-        return
-      }
-      
-      let windowSceneVC = self.getRootViewControllerFromWindowScene()
-      if let windowSceneVC, let viewController {
-        viewController.modalPresentationStyle = .fullScreen
-        let chatNavigationController = UINavigationController(rootViewController: viewController)
-        windowSceneVC.present(chatNavigationController, animated: true)
-        callback([["nuggetSDKResult": true]])
-        return
-      }
+        let viewController = self.nuggetFactory?.contentViewController(deeplink: deeplink)
+        let rootViewController = UIApplication.shared.delegate?.window??.rootViewController
+        if let rootViewController, let viewController {
+            viewController.modalPresentationStyle = .fullScreen
+            let chatNavigationController = UINavigationController(rootViewController: viewController)
+            rootViewController.present(chatNavigationController, animated: true)
+            resolve(["nuggetSDKResult": true])
+            return
+        }
+        let windowSceneVC = self.getRootViewControllerFromWindowScene()
+        if let windowSceneVC, let viewController {
+            viewController.modalPresentationStyle = .fullScreen
+            let chatNavigationController = UINavigationController(rootViewController: viewController)
+            windowSceneVC.present(chatNavigationController, animated: true)
+            resolve(["nuggetSDKResult": true])
+            return
+        }
+        // If we reach here, presentation failed
+        reject("NO_VIEW_CONTROLLER", "Could not present Nugget SDK view controller", nil)
     }
-  }
-  
+}
+
   @MainActor @available(iOS 13.0, *)
   private func getRootViewControllerFromWindowScene() -> UIViewController? {
     guard
@@ -137,17 +138,17 @@ class NuggetRN: RCTEventEmitter {
     else {
       return nil
     }
-    
+
     if #available(iOS 15.0, *) {
       let keyWindowVC = windowScene.windows.first?.windowScene?.keyWindow?.rootViewController
       if keyWindowVC != nil {
         return keyWindowVC
       }
     }
-    
+
     return windowScene.windows.first?.rootViewController
   }
-  
+
   func requestValueFromJS(
     method: String, payload: [String: Any], completion: @escaping (Any) -> Void
   ) {
@@ -159,7 +160,7 @@ class NuggetRN: RCTEventEmitter {
         "payload": payload,
       ])
   }
-  
+
   @objc
   func onJsResponse(_ method: String, result: Any) {
     if let completion = pendingCompletions[method] {
@@ -171,13 +172,13 @@ class NuggetRN: RCTEventEmitter {
 
 // MARK: Auth requirements
 extension NuggetRN: NuggetAuthProviderDelegate {
-  
+
   private func createAuthObjectFromDictionary(dictionary: [String: Any]) -> NuggetAuthUserInfo? {
     print("createAuthObjectFromDictionary", dictionary)
     guard let accessToken = dictionary["accessToken"] as? String else { return nil }
     return ClientAuthToken(accessToken: accessToken)
   }
-  
+
   func authManager(requiresAuthInfo completion: @escaping ((NuggetAuthUserInfo)?, (Error)?) -> Void) {
     requestValueFromJS(method: "requiresAuthInfo", payload: [:]) { result in
       guard let passesValue = result as? [String: Any],
@@ -188,7 +189,7 @@ extension NuggetRN: NuggetAuthProviderDelegate {
       completion(authInfo, nil)
     }
   }
-  
+
   func authManager(requestRefreshAuthInfo completion: @escaping ((any NuggetAuthUserInfo)?, (any Error)?) -> Void) {
     requestValueFromJS(method: "requestRefreshAuthInfo", payload: [:]) { result in
       guard let passesValue = result as? [String: Any],
@@ -199,14 +200,14 @@ extension NuggetRN: NuggetAuthProviderDelegate {
       completion(authInfo, nil)
     }
   }
-  
+
   struct ClientAuthToken: NuggetAuthUserInfo {
     var clientID: Int = 1
     var accessToken: String
     var userName: String? = nil
     var userID: String = .init()
     var photoURL: String = .init()
-    
+
     init(accessToken: String) {
       self.accessToken = accessToken
     }
@@ -218,9 +219,9 @@ private struct ClientNuggetSDKConfiguration: NuggetSDKConfigurationDelegate {
   func chatScreenClosedCallback() {
     print("chat screen closed")
   }
-  
+
   init() { }
-  
+
   private var configuration: [String: Any]?
   private var handleDeeplinkInsideApp: NSNumber?
   private var accentColorData: [String: Any]?
@@ -232,13 +233,13 @@ private struct ClientNuggetSDKConfiguration: NuggetSDKConfigurationDelegate {
     self.accentColorData = accentColorData
     self.fontData = fontData
   }
-  
+
   private func createSDKConfigObjectFromDictionary( dictionary: [String: Any]?) -> NuggetJumboConfiguration {
     let nameSpace = dictionary?["nameSpace"] as? String ?? ""
     let jumboUrl = dictionary?["jumboUrl"] as? String
     return NuggetJumboConfiguration(nameSpace: nameSpace, jumboUrl: jumboUrl)
   }
-  
+
   func jumboConfiguration(completion: @escaping (NuggetJumboConfiguration) -> Void) {
     let configObject = self.createSDKConfigObjectFromDictionary(dictionary: configuration)
     completion(configObject)
