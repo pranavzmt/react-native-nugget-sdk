@@ -79,7 +79,8 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": ">=0.73.2"
+    "react-native": ">=0.73.2",
+    "@react-native/gradle-plugin": "0.73.2"
   },
   "engines": {
     "node": ">= 18.0.0"
@@ -158,9 +159,7 @@
     ]
   },
   "dependencies": {
-    "@babel/runtime": "^7.27.4",
-    "react-native": "0.73.2",
-    "@react-native/gradle-plugin": "0.73.2",
+    "@babel/runtime": "^7.28.2",
     "@types/react-native-fs": "^2.8.3",
     "react-native-fs": "^2.20.0",
     "ts-lint": "^4.5.1"
