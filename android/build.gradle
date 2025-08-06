@@ -57,7 +57,7 @@ repositories {
 dependencies {
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.20"
-  implementation("com.eternal.kits:chatsdk:0.67.7")
+  implementation("com.eternal.kits:chatsdk:0.68.7")
 }
 
 if (isNewArchitectureEnabled()) {

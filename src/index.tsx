@@ -80,7 +80,7 @@ export class NuggetSDK {
     private eventEmitter: NativeEventEmitter;
     private eventSubscription: any;
 
-    private constructor(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext, handleDeeplinkInsideApp? : boolean , accentColorData? : AccentColorData , fontData? : FontData) {
+    private constructor(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext, handleDeeplinkInsideApp : boolean , lightModeAccentColorData? : AccentColorData , darkModeAccentColorData? : AccentColorData , fontData? : FontData , isDarkModeEnabled? : boolean) {
         this.config = config;
         this.eventEmitter = new NativeEventEmitter(NuggetPlugin);
         this.eventSubscription = this.eventEmitter.addListener(
@@ -122,7 +122,7 @@ export class NuggetSDK {
                 }
             }
         );
-        NuggetPlugin.initializeNuggetFactory(config, chatSupportBusinessContext , handleDeeplinkInsideApp , accentColorData , fontData);
+        NuggetPlugin.initializeNuggetFactory(config, chatSupportBusinessContext , handleDeeplinkInsideApp , lightModeAccentColorData , darkModeAccentColorData , fontData , isDarkModeEnabled);
     }
 
   private triggerDeeplink(deeplink: string) : DeeplinkResult {
@@ -156,10 +156,10 @@ export class NuggetSDK {
         return { ...this.config };
     }
 
-    public static getInstance(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext, handleDeeplinkInsideApp? : boolean , accentColorData? : AccentColorData , fontData? : FontData): NuggetSDK {
+    public static getInstance(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext, handleDeeplinkInsideApp? : boolean , lightModeAccentColorData? : AccentColorData , darkModeAccentColorData? : AccentColorData , fontData? : FontData, isDarkModeEnabled? : boolean): NuggetSDK {
 
         if (!NuggetSDK.instance) {
-            NuggetSDK.instance = new NuggetSDK(config, chatSupportBusinessContext , handleDeeplinkInsideApp , accentColorData , fontData);
+            NuggetSDK.instance = new NuggetSDK(config, chatSupportBusinessContext , handleDeeplinkInsideApp , lightModeAccentColorData , darkModeAccentColorData ,  fontData , isDarkModeEnabled);
         }
         // If called again with a new config, the existing instance's config is not updated.
         // This is typical for basic singletons: initialize once.
@@ -208,7 +208,7 @@ export class NuggetSDK {
         }
         try {
             const result = await NuggetPlugin.openNuggetSDK(deeplink);
-            if (result && (result.nuggetSDKResult === true || result.success === true)) {
+            if (result === true || (result && (result.nuggetSDKResult === true || result.success === true))) {
                 console.log('SDK opened successfully');
                 return Promise.resolve(true);
             } else {
