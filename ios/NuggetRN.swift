@@ -2,7 +2,7 @@ import Foundation
 import NuggetSDK
 import React
 
-struct ClientSideNuggetChatBusinessContext: NuggetChatBusinessContext {
+fileprivate struct ClientSideNuggetChatBusinessContext: NuggetChatBusinessContext {
   var type: String?
   var ticketID: Int?
   var channelHandle: String?
@@ -21,8 +21,7 @@ struct ClientSideNuggetChatBusinessContext: NuggetChatBusinessContext {
   }
 }
 
-class ClientSideNuggetChatBusinessContextDelegate: NuggetBusinessContextProviderDelegate {
-
+fileprivate class ClientSideNuggetChatBusinessContextProvider: NuggetBusinessContextProviderDelegate {
   private let params: [String: Any]?
   init(params: [String: Any]?) {
     self.params = params
@@ -45,6 +44,30 @@ class ClientSideNuggetChatBusinessContextDelegate: NuggetBusinessContextProvider
   }
 }
 
+fileprivate class ClientSideNuggetThemeProvider: NuggetThemeProviderDelegate {
+  var defaultLightModeAccentHexColor: String {
+    lightModeAccentColorData?["hex"] as? String ?? "#4E44E4"
+  }
+  
+  var defaultDarkModeAccentHexColor: String {
+    darkModeAccentColorData?["hex"] as? String ?? "#4E44E4"
+  }
+  var deviceInterfaceStyle: UIUserInterfaceStyle {
+    isDarkModeEnabled?.boolValue == true ? .dark : .light
+  }
+  
+  private let lightModeAccentColorData: [String: Any]?
+  private let darkModeAccentColorData: [String: Any]?
+  private let isDarkModeEnabled: NSNumber?
+  
+  init (lightModeAccentColorData: [String: Any]?,
+        darkModeAccentColorData: [String: Any]?,
+        isDarkModeEnabled: NSNumber?) {
+    self.lightModeAccentColorData = lightModeAccentColorData
+    self.darkModeAccentColorData = darkModeAccentColorData
+    self.isDarkModeEnabled = isDarkModeEnabled
+  }
+}
 
 @objc(NuggetRN)
 class NuggetRN: RCTEventEmitter {
@@ -74,23 +97,29 @@ class NuggetRN: RCTEventEmitter {
     resolve(["canOpenDeeplink": canOpenDeeplink])
   }
 
-  var clientSideNuggetChatBusinessContextDelegate :ClientSideNuggetChatBusinessContextDelegate?
-  var clientNuggetSDKConfiguration :NuggetSDKConfigurationDelegate = ClientNuggetSDKConfiguration()
-  var nuggetPushNotificationsListener: NuggetPushNotificationsListener = NuggetPushNotificationsListener()
+  fileprivate var clientSideNuggetChatBusinessContextDelegate :ClientSideNuggetChatBusinessContextProvider?
+  fileprivate var clientSideThemeProviderDelegate :NuggetThemeProviderDelegate?
+  fileprivate var clientNuggetSDKConfiguration :NuggetSDKConfigurationDelegate = ClientNuggetSDKConfiguration()
+  fileprivate var nuggetPushNotificationsListener: NuggetPushNotificationsListener = NuggetPushNotificationsListener()
 
   @objc
   func initializeNuggetFactory(_ sdkConfiguration: [String: Any],
                                chatSupportBusinessContext: [String: Any],
                                handleDeeplinkInsideApp: NSNumber?,
-                               accentColorData: [String: Any]?,
-                               fontData: [String: Any]?) {
-    clientNuggetSDKConfiguration = ClientNuggetSDKConfiguration(configuration: sdkConfiguration, handleDeeplinkInsideApp: handleDeeplinkInsideApp, accentColorData: accentColorData, fontData: fontData)
-    clientSideNuggetChatBusinessContextDelegate = ClientSideNuggetChatBusinessContextDelegate(params: chatSupportBusinessContext)
+                               lightModeAccentColorData: [String: Any]?,
+                               darkModeAccentColorData: [String: Any]?,
+                               fontData: [String: Any]?,
+                               isDarkModeEnabled: NSNumber?) {
+    clientNuggetSDKConfiguration = ClientNuggetSDKConfiguration(configuration: sdkConfiguration, handleDeeplinkInsideApp: handleDeeplinkInsideApp, accentColorData: lightModeAccentColorData, fontData: fontData)
+    clientSideNuggetChatBusinessContextDelegate = ClientSideNuggetChatBusinessContextProvider(params: chatSupportBusinessContext)
+    clientSideThemeProviderDelegate = ClientSideNuggetThemeProvider(lightModeAccentColorData: lightModeAccentColorData, darkModeAccentColorData: darkModeAccentColorData, isDarkModeEnabled: isDarkModeEnabled)
     nuggetFactory = NuggetSDK.initializeNuggetFactory(
       authDelegate: self,
       notificationDelegate: nuggetPushNotificationsListener,
       sdkConfigurationDelegate: clientNuggetSDKConfiguration,
-      chatBusinessContextDelegate: clientSideNuggetChatBusinessContextDelegate)
+      chatBusinessContextDelegate: clientSideNuggetChatBusinessContextDelegate,
+      customThemeProviderDelegate: clientSideThemeProviderDelegate
+    )
   }
 
   @objc
