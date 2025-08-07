@@ -63,15 +63,20 @@ export const NuggetSDKProvider: React.FC<NuggetSDKProviderProps> = ({
             //     'botProperty2': ['value7', 'value8']
             // }
         };
-       const accentColorData : AccentColorData = {
+       const lightModeAccentColorData : AccentColorData = {
           hex : '#FFF000'
+       }
+        const darkModeAccentColorData : AccentColorData = {
+               hex : '#FFF000'
        }
         const fontData : FontData = {
              fontMapping : new Map<string, string>([
                  ['regular' , 'pixarRegular']
              ])
-         }
-        const nuggetSDKInstance = NuggetSDK.getInstance(sdkConfig, chatSupportBusinessContext , false , accentColorData , fontData);
+           }
+        const handleDeeplinkInsideApp : boolean = false;
+        const isDarkModeEnabled : boolean = false;
+        const nuggetSDKInstance = NuggetSDK.getInstance(sdkConfig, chatSupportBusinessContext , handleDeeplinkInsideApp , lightModeAccentColorData , darkModeAccentColorData , fontData , isDarkModeEnabled);
         const authDelegate = new NuggetAuthProviderImpl('your-access-token-goes-here');
         nuggetSDKInstance.setAuthDelegate(authDelegate);
         return nuggetSDKInstance;

@@ -9,7 +9,13 @@ RCT_EXTERN_METHOD(canOpenDeeplink:(NSString *)deeplink resolver:(RCTPromiseResol
 
 RCT_EXTERN_METHOD(openNuggetSDK:(NSString *)deeplink resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(initializeNuggetFactory:(NSDictionary *)sdkConfiguration chatSupportBusinessContext:(NSDictionary *)chatSupportBusinessContext handleDeeplinkInsideApp:(nonnull NSNumber *)handleDeeplinkInsideApp accentColorData:(NSDictionary *)accentColorData fontData:(NSDictionary *)fontData)
+RCT_EXTERN_METHOD(initializeNuggetFactory:(NSDictionary *)sdkConfiguration
+                  chatSupportBusinessContext:(NSDictionary *)chatSupportBusinessContext
+                  handleDeeplinkInsideApp:(nonnull NSNumber *)handleDeeplinkInsideApp
+                  lightModeAccentColorData:(NSDictionary *)lightModeAccentColorData
+                  darkModeAccentColorData:(NSDictionary *)darkModeAccentColorData
+                  fontData:(NSDictionary *)fontData
+                  isDarkModeEnabled:(nonnull NSNumber *)isDarkModeEnabled)
 
 RCT_EXTERN_METHOD(onJsResponse:(NSString *)method result:(id)result)
 

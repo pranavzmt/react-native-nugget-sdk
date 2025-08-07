@@ -46,6 +46,18 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
   private var ticketGroupingId : String? = null
   private var ticketProperties : HashMap<String , ArrayList<String>>? = null
   private var botProperties : HashMap<String , ArrayList<String>>? = null
+  private var nameSpace : String? = null
+
+  private var handleDeeplinkInsideTheApp : Boolean? = null
+  private var lightModeAccentColorTint : String? = null
+  private var lightModeAccentColorType : String? = null
+  private var lightModeAccentColorHex : String? = null
+
+  private var darkModeAccentColorTint : String? = null
+  private var darkModeAccentColorType : String? = null
+  private var darkModeAccentColorHex : String? = null
+
+  private var isInitialized = false
 
   companion object {
     const val NAME = "NuggetRN"
@@ -60,8 +72,10 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
     jumboConfiguration: ReadableMap?,
     businessContext: ReadableMap?,
     handleDeeplinkInsideApp : Boolean?,
-    accentColorData : ReadableMap?,
+    lightModeAccentColorData : ReadableMap?,
+    darkModeAccentColorData : ReadableMap?,
     fontData : ReadableMap?,
+    isDarkModeEnabled : Boolean?,
     promise: Promise
   ) {
     try {
@@ -70,22 +84,29 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
 
       Log.i("ChatSampleApp", "Initialising NuggetSDK method called")
 
-      val namespace = jumboConfiguration?.getString("nameSpace") ?: ""
+      nameSpace = jumboConfiguration?.getString("nameSpace") ?: ""
 
       channelHandle = businessContext?.getString("channelHandle")
       ticketGroupingId = businessContext?.getString("ticketGroupingId")
       botProperties = resolveCustomProperties(key = "botProperties" , map = businessContext)
       ticketProperties = resolveCustomProperties(key = "ticketProperties" , map = businessContext)
 
-      val handleDeeplinkInsideTheApp = (handleDeeplinkInsideApp == true)
+      handleDeeplinkInsideTheApp = (handleDeeplinkInsideApp == true)
 
-      val accentColorTint = accentColorData?.getString("tint") ?: null
-      val accentColorType = accentColorData?.getString("type") ?: null
-      val accentColorHex = accentColorData?.getString("hex") ?: null
+      lightModeAccentColorTint = lightModeAccentColorData?.getString("tint") ?: null
+      lightModeAccentColorType = lightModeAccentColorData?.getString("type") ?: null
+      lightModeAccentColorHex = lightModeAccentColorData?.getString("hex") ?: null
+
+      darkModeAccentColorTint = darkModeAccentColorData?.getString("tint") ?: null
+      darkModeAccentColorType = darkModeAccentColorData?.getString("type") ?: null
+      darkModeAccentColorHex = darkModeAccentColorData?.getString("hex") ?: null
 
       val fontMapping = fontData?.getMap("fontMapping")
 
-      Log.i("ChatSampleApp" , "Accent color hex : ${accentColorHex} fontData : ${fontData} fontMapping : ${fontMapping}")
+//      Log.i("ChatSampleApp" , "Handle deeplink inside app : ${handleDeeplinkInsideApp} Dark mode enabled value : ${isDarkModeEnabled}")
+//      Log.i("ChatSampleApp" , "Namespace : ${nameSpace} Light mode accent color hex : ${lightModeAccentColorHex}")
+
+      if(isInitialized) return
 
       ChatSdk.initialize(
         context as Application, initInterface = object : ChatSDKInitCommunicator {
@@ -139,17 +160,27 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
             triggerDeeplinkInApp(context, url, bundle , "triggerDeeplinkInApp")
           }
 
+          override fun isDarkModeEnabled(): Boolean {
+            return isDarkModeEnabled == true
+          }
+
         }, initConfig = ChatSdkInitConfig(
-          namespace = namespace,
-          handleDeeplinkInApp = handleDeeplinkInsideTheApp,
-          accentColorData = ColorData(
-            type = accentColorType,
-            tint = accentColorTint,
-            hex = accentColorHex
+          namespace = nameSpace ?: "",
+          handleDeeplinkInApp = handleDeeplinkInsideTheApp ?: false,
+          lightModeAccentColorData = ColorData(
+            type = lightModeAccentColorType,
+            tint = lightModeAccentColorTint,
+            hex = lightModeAccentColorHex
+          ),
+          darkModeAccentColorData = ColorData(
+            type = darkModeAccentColorType,
+            tint = darkModeAccentColorTint,
+            hex = darkModeAccentColorHex
           )
         )
       )
 
+      isInitialized = true
       promise.resolve(true)
     } catch (e: Exception) {
       promise.reject("NUGGET_SDK_INIT_ERROR", e.message, e)
