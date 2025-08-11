@@ -202,7 +202,7 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
     sendEventToJS(method , payload)
   }
 
-  private suspend fun requestAuthInfo(method : String): ChatSdkAccessTokenData = withContext(Dispatchers.Main) {
+  private suspend fun requestAuthInfo(method : String): ChatSdkAccessTokenData {
     val deferred = CompletableDeferred<ReadableMap>()
     pendingResponses[method] = deferred
 
@@ -239,25 +239,22 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun openNuggetSDK(deeplink: String, promise: Promise) : Unit {
+  fun openNuggetSDK(deeplink: String, promise: Promise) {
     try {
-
-      Log.i(
-        "ChatSampleApp",
-        "Inside try block of launching NuggetSDK, currAct. :${currentActivity}"
-      )
-
-      val activity = currentActivity ?: return
-
-      val context = reactApplicationContext
-      val intent = Intent(context, ChatSDKDeepLinkRouter::class.java).apply {
-        putExtra("uri", deeplink)
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      val activity = currentActivity ?: run {
+        promise.reject("NO_ACTIVITY", "Current activity is null")
+        return
       }
-      context.startActivity(intent)
+
+      Log.i("ChatSampleApp", "Launching NuggetSDK from $activity")
+
+      val intent = Intent(activity, ChatSDKDeepLinkRouter::class.java).apply {
+        putExtra("uri", deeplink)
+      }
+      activity.startActivity(intent)
       promise.resolve(true)
     } catch (e: Exception) {
-      Log.i("ChatSampleApp", "Exception in opening chat : ${e.message}")
+      Log.e("ChatSampleApp", "Error opening chat: ${e.message}", e)
       promise.reject("OPEN_SDK_ERROR", "Failed to open Nugget SDK", e)
     }
   }
