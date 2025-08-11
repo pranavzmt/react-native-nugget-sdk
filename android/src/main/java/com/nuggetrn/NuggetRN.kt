@@ -208,7 +208,7 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
 
     sendEventToJS(method)
 
-    try {
+    return try {
       val resultMap = deferred.await()
       val token = resultMap.getString("accessToken") ?: ""
       val httpCode = resultMap.getInt("httpCode") ?: -1
