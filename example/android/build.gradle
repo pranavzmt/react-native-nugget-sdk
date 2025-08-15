@@ -12,6 +12,7 @@ buildscript {
   }
   repositories {
     google()
+    mavenLocal()
     mavenCentral()
   }
   dependencies {
@@ -27,6 +28,7 @@ plugins {
 allprojects {
   repositories {
     google()
+    mavenLocal()
     mavenCentral()
     maven {  url 'https://maven.fpregistry.io/releases'  }
     maven {  url 'https://jitpack.io'  }

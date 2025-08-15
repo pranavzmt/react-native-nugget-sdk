@@ -57,6 +57,9 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
   private var darkModeAccentColorType : String? = null
   private var darkModeAccentColorHex : String? = null
 
+  private var currentAccessToken : String? = null
+  private var httpCode : Int? = null
+
   private var isInitialized = false
 
   companion object {
@@ -82,14 +85,13 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
       // Call actual SDK initialization using app context
       val context = reactContext.applicationContext
 
+      requestAuthInfo("requiresAuthInfo")
+
       Log.i("ChatSampleApp", "Initialising NuggetSDK method called")
 
       nameSpace = jumboConfiguration?.getString("nameSpace") ?: ""
 
-      channelHandle = businessContext?.getString("channelHandle")
-      ticketGroupingId = businessContext?.getString("ticketGroupingId")
-      botProperties = resolveCustomProperties(key = "botProperties" , map = businessContext)
-      ticketProperties = resolveCustomProperties(key = "ticketProperties" , map = businessContext)
+      updateBusinessContext(businessContext = businessContext)
 
       handleDeeplinkInsideTheApp = (handleDeeplinkInsideApp == true)
 
@@ -103,20 +105,15 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
 
       val fontMapping = fontData?.getMap("fontMapping")
 
-//      Log.i("ChatSampleApp" , "Handle deeplink inside app : ${handleDeeplinkInsideApp} Dark mode enabled value : ${isDarkModeEnabled}")
-//      Log.i("ChatSampleApp" , "Namespace : ${nameSpace} Light mode accent color hex : ${lightModeAccentColorHex}")
-
       if(isInitialized) return
 
       ChatSdk.initialize(
         context as Application, initInterface = object : ChatSDKInitCommunicator {
           override suspend fun getAccessTokenData(payloadArgs : HashMap<String, String>?): ChatSdkAccessTokenData {
-
-            val tokenData = requestAuthInfo("requiresAuthInfo")
-
-            Log.i("ChatSampleApp" , "Token received : ${tokenData?.accessToken}")
-
-            return tokenData
+            return ChatSdkAccessTokenData(
+              currentAccessToken ?: "",
+              httpCode ?: -1
+            )
           }
 
           override fun getBusinessContext(payloadArgs : HashMap<String, String>?): BusinessContext {
@@ -129,8 +126,7 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
           }
 
           override suspend fun getRefreshToken(payloadArgs : HashMap<String, String>?): String {
-            val tokenData = requestAuthInfo("requestRefreshAuthInfo")
-            return tokenData?.accessToken ?: ""
+            return currentAccessToken ?: ""
           }
 
           override fun getTextAppearance(fontWeight: Int): Int? {
@@ -202,22 +198,10 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
     sendEventToJS(method , payload)
   }
 
-  private suspend fun requestAuthInfo(method : String): ChatSdkAccessTokenData {
+  private fun requestAuthInfo(method : String) {
     val deferred = CompletableDeferred<ReadableMap>()
     pendingResponses[method] = deferred
-
     sendEventToJS(method)
-
-    return try {
-      val resultMap = deferred.await()
-      val token = resultMap.getString("accessToken") ?: ""
-      val httpCode = resultMap.getInt("httpCode") ?: -1
-      Log.i("ChatSampleApp" , "Received token in requestAuthInfo : ${token}")
-      ChatSdkAccessTokenData(token, 200)
-    } catch (e: Exception) {
-      Log.i("ChatSampleApp" , "Exception caught in requestAuthInfo : ${e.message}")
-      ChatSdkAccessTokenData("", -1)
-    }
   }
 
   private fun sendEventToJS(method: String, payload: WritableMap? = null) {
@@ -234,6 +218,13 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
   @ReactMethod
   fun onJsResponse(method: String, payload: ReadableMap) {
     Log.i("ChatSampleApp", "Received response for method: ${method} and payload : ${payload}")
+
+    if(method == "requiresAuthInfo"){
+      this.currentAccessToken = payload?.getString("accessToken") ?: ""
+      this.httpCode = payload?.getInt("httpCode") ?: -1
+      Log.i("ChatSampleApp" , "Received access token as : ${this.currentAccessToken} , httpcode as : ${this.httpCode}")
+    }
+
     pendingResponses[method]?.complete(payload)
     pendingResponses.remove(method)
   }
@@ -257,6 +248,16 @@ class NuggetRN(private val reactContext: ReactApplicationContext) :
       Log.e("ChatSampleApp", "Error opening chat: ${e.message}", e)
       promise.reject("OPEN_SDK_ERROR", "Failed to open Nugget SDK", e)
     }
+  }
+
+
+  @ReactMethod
+  fun updateBusinessContext(businessContext: ReadableMap?){
+    channelHandle = businessContext?.getString("channelHandle")
+    ticketGroupingId = businessContext?.getString("ticketGroupingId")
+    botProperties = resolveCustomProperties(key = "botProperties" , map = businessContext)
+    ticketProperties = resolveCustomProperties(key = "ticketProperties" , map = businessContext)
+    Log.i("ChatSampleApp" , "Bot properties from business context : ${botProperties} ticketProperties : ${ticketProperties}")
   }
 
   override fun onActivityResult(

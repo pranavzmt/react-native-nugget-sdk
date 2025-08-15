@@ -13,21 +13,37 @@ const NuggetSDKContext = createContext<NuggetSDKContextType | null>(null);
 
 // Auth Provider Implementation
 class NuggetAuthProviderImpl implements NuggetAuthProvider {
-    private accessToken: string = 'accessToken-goes-here';
+    private accessToken: string = '';
 
     constructor(initialToken: string = '') {
         this.accessToken = initialToken;
         console.log('This.accesstoken ' + this.accessToken)
     }
 
-    async getAuthInfo(): Promise<NuggetAuthUserInfo> {
-      // call your access token API here, set this.accessToken = received token anf return token as well as http code
-      console.log('Returning access token from getAuthInfo: ' + this.accessToken)
-        return {
-            accessToken: this.accessToken,
-            httpCode : 200 // return the actual http code received after calling API
-        };
-    }
+async getAuthInfo(): Promise<NuggetAuthUserInfo> {
+    return new Promise((resolve) => {
+        if (this.accessToken && this.accessToken.trim() !== '') {
+            console.log('Returning access token directly from cache as ' + this.accessToken);
+            resolve({
+                accessToken: this.accessToken,
+                httpCode: 200
+            });
+            return;
+        }
+
+        setTimeout(() => {
+            // Call API and set access token variable here
+            this.accessToken = '';
+            console.log('Returning access token from getAuthInfo: ' + this.accessToken);
+            resolve({
+                accessToken: this.accessToken,
+                httpCode: 200
+            });
+        }, 2000);
+    });
+}
+
+
 
     async refreshAuthInfo(): Promise<NuggetAuthUserInfo> {
       // call your refresh token API here , set this.accessToken = received token and return token as well as http code
@@ -77,7 +93,7 @@ export const NuggetSDKProvider: React.FC<NuggetSDKProviderProps> = ({
         const handleDeeplinkInsideApp : boolean = false;
         const isDarkModeEnabled : boolean = false;
         const nuggetSDKInstance = NuggetSDK.getInstance(sdkConfig, chatSupportBusinessContext , handleDeeplinkInsideApp , lightModeAccentColorData , darkModeAccentColorData , fontData , isDarkModeEnabled);
-        const authDelegate = new NuggetAuthProviderImpl('your-access-token-goes-here');
+        const authDelegate = new NuggetAuthProviderImpl('');
         nuggetSDKInstance.setAuthDelegate(authDelegate);
         return nuggetSDKInstance;
     }, [nameSpace, initialAuthToken]);

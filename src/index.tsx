@@ -113,6 +113,7 @@ export class NuggetSDK {
                             result = { error: 'Unknown method' };
                     }
 
+                    console.log('Calling onJSResponse for method: ' + method);
                     NuggetPlugin.onJsResponse(method, result);
                 } catch (error) {
                     console.error('Error handling native request:', error);
@@ -220,6 +221,16 @@ export class NuggetSDK {
             console.error('Error opening SDK:', error);
             return Promise.reject(new Error(error?.message || 'Failed to open SDK'));
         }
+    }
+
+
+    public updateBusinessContext(chatSupportBusinessContext: NuggetChatBusinessContext){
+      if (!NuggetSDK.instance) {
+        console.log('NuggetSDK not initialised');
+        return
+      }
+
+      NuggetPlugin.updateBusinessContext(chatSupportBusinessContext);
     }
 
 }
