@@ -157,20 +157,29 @@ export class NuggetSDK {
         return { ...this.config };
     }
 
+     public cleanup(): void {
+       if (this.eventSubscription) {
+           this.eventSubscription.remove();
+           this.eventSubscription = null;
+       }
+       this.eventEmitter = null;
+       console.log("NuggetSDK cleaned up");
+     }
+
     public static getInstance(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext, handleDeeplinkInsideApp? : boolean , lightModeAccentColorData? : AccentColorData , darkModeAccentColorData? : AccentColorData , fontData? : FontData, isDarkModeEnabled? : boolean): NuggetSDK {
 
-        if (!NuggetSDK.instance) {
-            NuggetSDK.instance = new NuggetSDK(config, chatSupportBusinessContext , handleDeeplinkInsideApp , lightModeAccentColorData , darkModeAccentColorData ,  fontData , isDarkModeEnabled);
-        }
-        // If called again with a new config, the existing instance's config is not updated.
-        // This is typical for basic singletons: initialize once.
-        return NuggetSDK.instance;
+         if (NuggetSDK.instance) {
+             NuggetSDK.instance.cleanup();
+             NuggetSDK.instance = null;
+         }
+
+         NuggetSDK.instance = new NuggetSDK(config, chatSupportBusinessContext , handleDeeplinkInsideApp , lightModeAccentColorData , darkModeAccentColorData ,  fontData , isDarkModeEnabled);
+         return NuggetSDK.instance;
     }
 
     public setAuthDelegate(delegate: NuggetAuthProvider) {
         this.authDelegate = delegate;
     }
-
 
     /**
      * Checks if the SDK can handle the given deeplink
