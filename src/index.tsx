@@ -159,12 +159,12 @@ export class NuggetSDK {
 
     public static getInstance(config: NuggetJumborConfiguration, chatSupportBusinessContext: NuggetChatBusinessContext, handleDeeplinkInsideApp? : boolean , lightModeAccentColorData? : AccentColorData , darkModeAccentColorData? : AccentColorData , fontData? : FontData, isDarkModeEnabled? : boolean): NuggetSDK {
 
-        if (!NuggetSDK.instance) {
-            NuggetSDK.instance = new NuggetSDK(config, chatSupportBusinessContext , handleDeeplinkInsideApp , lightModeAccentColorData , darkModeAccentColorData ,  fontData , isDarkModeEnabled);
-        }
+//         if (!NuggetSDK.instance) {
+            return new NuggetSDK(config, chatSupportBusinessContext , handleDeeplinkInsideApp , lightModeAccentColorData , darkModeAccentColorData ,  fontData , isDarkModeEnabled);
+//         }
         // If called again with a new config, the existing instance's config is not updated.
         // This is typical for basic singletons: initialize once.
-        return NuggetSDK.instance;
+//         return NuggetSDK.instance;
     }
 
     public setAuthDelegate(delegate: NuggetAuthProvider) {
